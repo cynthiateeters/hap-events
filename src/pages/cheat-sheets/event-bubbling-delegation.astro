@@ -1,0 +1,267 @@
+---
+/**
+ * Cheat Sheet: Event Bubbling and Delegation
+ * Companion reference for Station 4
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const bubblingPathCode = `// Click on <span class="robot-name"> inside a .robot-card
+// The event travels up:
+//
+//   span.robot-name        ← event fires here first (event.target)
+//   div.robot-card
+//   div.card-container     ← delegated listener lives here
+//   main
+//   body
+//   html
+//   document
+//   window
+//
+// Any element with a matching listener along the path fires it.`;
+
+const delegationPatternCode = `// The delegation pattern
+const container = document.querySelector('.card-container');
+
+container.addEventListener('click', function(event) {
+  // Find the nearest .robot-card ancestor of what was clicked
+  const card = event.target.closest('.robot-card');
+
+  // Guard: if click missed all cards, do nothing
+  if (!card) return;
+
+  // Work with the card
+  console.log(card.dataset.robotId);
+});`;
+
+const closestPatternCode = `// .closest(selector) walks UP the DOM tree
+// Returns the nearest ancestor matching selector
+// Returns null if no match is found
+
+// Starting from event.target (the clicked element):
+const card = event.target.closest('.robot-card');
+
+// Works whether the user clicked:
+//   - the .robot-card div itself
+//   - a .robot-name span inside it
+//   - an icon or image inside that span
+// All three bubble up through .robot-card.`;
+
+const targetVsCurrentTargetCode = `// event.target vs. event.currentTarget in delegation
+
+container.addEventListener('click', function(event) {
+  console.log(event.target);
+  // The element actually clicked — could be a span, icon, etc.
+  // This changes with every click.
+
+  console.log(event.currentTarget);
+  // Always the element the listener is attached to — the container.
+  // This never changes.
+});`;
+
+const stopPropagationCode = `// Stopping bubbling (use carefully)
+innerButton.addEventListener('click', function(event) {
+  event.stopPropagation();
+  // This event will NOT bubble up to parent listeners.
+  // Useful when a child has a different action than the parent.
+  // Overusing this breaks delegation — parent listeners never fire.
+});`;
+
+const dynamicCardCode = `// Dynamic cards work automatically with delegation
+// — no extra listener needed
+
+const newCard = document.createElement('div');
+newCard.classList.add('robot-card');         // delegation targets this class
+newCard.dataset.robotId = 'unit-99';         // data your handler reads
+newCard.innerHTML = '<span class="robot-name">Unit 99</span>';
+
+container.appendChild(newCard);
+// Clicking newCard bubbles up to the container listener. ✓`;
+---
+
+<MainLayout
+    title="Event Bubbling and Delegation | HAP's Learning Lab"
+    description="Quick reference for event bubbling, the delegation pattern, .closest(), and event.target vs. event.currentTarget. Companion to Station 4."
+    headerTitle="Event Bubbling and Delegation"
+    headerSubtitle="Quick Reference"
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1759497938/HAP-learner_dvehmt.jpg"
+    avatarAlt="HAP studying and taking notes"
+    introContent="<p>Everything I learned about bubbling and delegation at Station 4, organized for quick reference. How events travel up the DOM, why one listener on a parent beats many on the children, and the <code>.closest()</code> pattern that made delegation actually work. 🟠</p>"
+    showNavigation={false}
+    footerReminder="Bubbling is a feature. Delegation is how you use it."
+>
+
+    <!-- Back link to Station 4 -->
+    <section class="content-section">
+        <p><a href="/stations/station4/">&larr; Back to Station 4: Bubbling Up</a></p>
+    </section>
+
+    <!-- ============================================================
+         How Bubbling Works
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">How Bubbling Works</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>Events Fire on the Target First</h3>
+                    <p>The element that was actually clicked is called <code>event.target</code>. The event fires there first, then travels upward through every ancestor.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>Every Ancestor Gets the Event</h3>
+                    <p>After the target, the event fires on the parent, grandparent, and so on up to <code>document</code> and <code>window</code>. Any element with a matching listener along the way will respond.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>Bubbling Is Default Behavior</h3>
+                    <p>Most DOM events bubble. Some do not (<code>focus</code>, <code>blur</code>). You do not need to do anything to make bubbling happen &mdash; it is always on unless you stop it.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         The Bubbling Path
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>The Bubbling Path</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">What happens when a nested element is clicked:</div>
+                <CodeBlock code={bubblingPathCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         The Delegation Pattern
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">The Delegation Pattern</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>Listen on a Parent, Not Every Child</h3>
+                    <p>Add one listener to the container. Any child that is clicked bubbles the event up to the container. The container's handler runs for all of them.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>Dynamic Children Work for Free</h3>
+                    <p>Elements added to the container after the listener was wired still bubble events up to it. No additional listeners needed when adding cards dynamically.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>Use .closest() to Identify the Card</h3>
+                    <p><code>event.target.closest('.robot-card')</code> finds the nearest ancestor matching the selector, starting from whatever element was actually clicked. Returns <code>null</code> if none found.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>Always Guard Against Null</h3>
+                    <p>After <code>.closest()</code>, check the result before using it: <code>if (!card) return;</code>. Clicks on container padding or gaps between cards return <code>null</code>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Delegation Pattern Code
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Delegation Pattern</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Complete delegation pattern:</div>
+                <CodeBlock code={delegationPatternCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         .closest() Pattern
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>The .closest() Pattern</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">How .closest() walks up the DOM:</div>
+                <CodeBlock code={closestPatternCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         event.target vs. event.currentTarget
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>event.target vs. event.currentTarget</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Which element is which in a delegated listener:</div>
+                <CodeBlock code={targetVsCurrentTargetCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Dynamic Cards
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Dynamic Cards with Delegation</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Adding a card that works with an existing delegated listener:</div>
+                <CodeBlock code={dynamicCardCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Stopping Propagation
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Stopping Propagation</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">stopPropagation — use carefully:</div>
+                <CodeBlock code={stopPropagationCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Back link to Station 4 -->
+    <section class="content-section">
+        <p><a href="/stations/station4/">&larr; Back to Station 4: Bubbling Up</a></p>
+    </section>
+
+</MainLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

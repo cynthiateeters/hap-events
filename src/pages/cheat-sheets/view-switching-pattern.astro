@@ -1,0 +1,221 @@
+---
+/**
+ * Cheat Sheet: The View-Switching Pattern
+ * Companion reference for Station 3
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const hiddenRuleCode = `/* One CSS rule handles all view hiding */
+.hidden {
+  display: none;
+}`;
+
+const viewHtmlCode = `<!-- Two view containers. One starts hidden. -->
+<div id="summary-view">
+  <!-- list of items here -->
+</div>
+
+<div id="detail-view" class="hidden">
+  <button id="back-btn">Back to list</button>
+  <!-- detail content here -->
+</div>`;
+
+const viewSwitchCode = `const summaryView = document.querySelector('#summary-view');
+const detailView  = document.querySelector('#detail-view');
+const backBtn     = document.querySelector('#back-btn');
+
+// Go to detail view
+function showDetail() {
+  summaryView.classList.add('hidden');    // hide outgoing first
+  detailView.classList.remove('hidden');  // then show incoming
+}
+
+// Return to summary view
+backBtn.addEventListener('click', function() {
+  detailView.classList.add('hidden');
+  summaryView.classList.remove('hidden');
+});`;
+
+const preventDefaultCode = `// Always listen on the <form> element, not the submit button
+const form = document.querySelector('#my-form');
+
+form.addEventListener('submit', function(event) {
+  event.preventDefault(); // Call first — stops the page reload
+
+  // Now read the data
+  const data = new FormData(form);
+  const value = data.get('field-name'); // Matches the input's name attribute
+
+  // Update the DOM, show a message, etc.
+  console.log('Form value:', value);
+});`;
+
+const formDataCode = `// Reading multiple fields from a form
+// HTML: <input name="title"> <input name="notes"> <select name="status">
+
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const data = new FormData(form);
+
+  const title  = data.get('title');   // string from text input
+  const notes  = data.get('notes');   // string from textarea
+  const status = data.get('status');  // selected option value
+
+  console.log({ title, notes, status });
+});`;
+
+const commonMistakesCode = `// MISTAKE 1: Forgetting to hide the outgoing view
+summaryView.classList.remove('hidden'); // Both views show at once!
+
+// CORRECT: hide first, then show
+summaryView.classList.add('hidden');
+detailView.classList.remove('hidden');
+
+// MISTAKE 2: Listening on the submit button instead of the form
+submitBtn.addEventListener('click', function(event) {
+  event.preventDefault(); // Misses Enter-key submissions
+});
+
+// CORRECT: Listen on the form
+form.addEventListener('submit', function(event) {
+  event.preventDefault(); // Catches all submission paths
+});
+
+// MISTAKE 3: Using inline style instead of a class
+element.style.display = 'none';    // Hard to reverse cleanly
+element.style.display = 'block';   // What if it was 'flex' or 'grid'?
+
+// CORRECT: toggle a class
+element.classList.add('hidden');
+element.classList.remove('hidden');`;
+---
+
+<MainLayout
+    title="The View-Switching Pattern | HAP's Learning Lab"
+    description="Quick reference for single-page view switching with classList, the .hidden pattern, preventDefault on forms, and reading form data with FormData."
+    headerTitle="The View-Switching Pattern"
+    headerSubtitle="Quick Reference"
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1759497938/HAP-learner_dvehmt.jpg"
+    avatarAlt="HAP studying and taking notes"
+    introContent="<p>Everything I learned about view switching and form handling at Station 3. The hide/show recipe, the <code>.hidden</code> class approach, <code>preventDefault</code> explained, and how to read form data without a page reload. 🟠</p>"
+    showNavigation={false}
+    footerReminder="One page, many views. classList.add('hidden') and classList.remove('hidden') are all you need."
+>
+
+    <!-- Back link to Station 3 -->
+    <section class="content-section">
+        <p><a href="/stations/station3/">&larr; Back to Station 3: Swapping Views</a></p>
+    </section>
+
+    <!-- ============================================================
+         The Pattern at a Glance
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">The Pattern at a Glance</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>Add a .hidden CSS rule</h3>
+                    <p>One rule in the stylesheet: <code>.hidden &#123; display: none; &#125;</code>. Every view container uses this class. Never set <code>display: none</code> inline &mdash; toggling a class is reversible without knowing what display value to restore.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>Start one view visible, rest hidden</h3>
+                    <p>All view containers live in the HTML from page load. Apply the <code>hidden</code> class in the HTML to all views except the default one. JavaScript toggles visibility &mdash; it does not create or destroy containers.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>Hide outgoing before showing incoming</h3>
+                    <p><code>classList.add('hidden')</code> on the departing view, then <code>classList.remove('hidden')</code> on the arriving view. Reversing the order causes both views to appear simultaneously for a moment.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>Listen on the form, not the button</h3>
+                    <p>The <code>'submit'</code> event fires on the <code>&lt;form&gt;</code> element. A listener on the submit button only catches mouse clicks &mdash; pressing Enter in a text field submits the form without clicking the button.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         View switching code
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>View Switching Code</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">The .hidden CSS rule:</div>
+                <CodeBlock code={hiddenRuleCode} lang="javascript" />
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">HTML structure:</div>
+                <CodeBlock code={viewHtmlCode} lang="html" />
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">Switching between views:</div>
+                <CodeBlock code={viewSwitchCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Forms and preventDefault
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Forms and preventDefault</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Prevent reload and handle submission:</div>
+                <CodeBlock code={preventDefaultCode} lang="javascript" />
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">Reading multiple form fields:</div>
+                <CodeBlock code={formDataCode} lang="javascript" />
+                <p class="code-comment mt-1">Each input needs a <code>name</code> attribute for <code>FormData</code> to pick it up. The <code>name</code> attribute is the key used with <code>data.get()</code>.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Common Mistakes
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Common Mistakes</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Mistakes I made (and how to avoid them):</div>
+                <CodeBlock code={commonMistakesCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Back link to Station 3 -->
+    <section class="content-section">
+        <p><a href="/stations/station3/">&larr; Back to Station 3: Swapping Views</a></p>
+    </section>
+
+</MainLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

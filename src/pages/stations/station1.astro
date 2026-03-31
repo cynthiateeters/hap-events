@@ -1,0 +1,267 @@
+---
+/**
+ * Station 1: Listening
+ * Primary concept: addEventListener — how you tell the browser
+ * "when this happens, run this function." Also introduces callbacks.
+ *
+ * Code role: Illustrative
+ * Characters: HAP, Prof. Teeters, Grace Hopper
+ */
+
+import StationLayout from '../../layouts/StationLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const introContent = `
+    <p><strong>Welcome to Station 1!</strong> After the DOM lab, my Robot ID Card looked great. I could read elements, change text, even build new parts. But when I clicked the status badge... nothing happened.</p>
+    <p class="mt-1">I kept clicking. I tried different elements. Still nothing. The page was completely ignoring me.</p>
+    <p class="mt-1">Prof. Teeters said, "Think of it like a doorbell. The button has always been there. But until you wire it to a bell, pressing it does nothing."</p>
+    <p class="mt-1">That's when I discovered addEventListener &mdash; the wiring that connects a user's action to my code.</p>
+    <p class="mt-1">Let me show you how I made my first click actually do something... 🟠</p>
+`;
+
+const simpleListenerCode = `// The three parts of addEventListener
+const statusBadge = document.querySelector('.status-badge');
+
+statusBadge.addEventListener('click', function(event) {
+  statusBadge.classList.toggle('active');
+});`;
+
+const callbackNamedCode = `// Using a named callback function
+const statusBadge = document.querySelector('.status-badge');
+
+function toggleStatus(event) {
+  statusBadge.classList.toggle('active');
+  console.log('Badge toggled!');
+}
+
+// Pass the function reference — no parentheses!
+statusBadge.addEventListener('click', toggleStatus);`;
+
+const callbackMistakeCode = `// Common mistake: CALLING the function instead of PASSING it
+statusBadge.addEventListener('click', toggleStatus());
+//                                               ^^
+// This CALLS toggleStatus immediately and passes
+// its return value (undefined) as the callback.
+// The click event will do nothing.
+
+// Correct: pass the function reference
+statusBadge.addEventListener('click', toggleStatus);
+//                                    ^^^^^^^^^^^^
+// No parentheses — this passes the function itself.
+// The browser stores it and calls it when the click happens.`;
+---
+
+<StationLayout
+    stationNumber={1}
+    title="Listening"
+    subtitle="addEventListener and callbacks"
+    description="HAP discovers addEventListener — the wiring that connects user clicks to JavaScript code. Learn the three-part pattern and what a callback really means."
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1763230490/hap-has-tools_kgoeys.jpg"
+    avatarAlt="HAP with tools ready, prepared to wire up event listeners"
+    introContent={introContent}
+    ogImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_1200,c_fill,g_auto/v1763230490/hap-has-tools_kgoeys.jpg"
+    nextStationTitle="What Just Happened?"
+    footerReminder="addEventListener is the wiring. The callback is the bell. Without both, clicks do nothing."
+    labName="The Living Page"
+    cheatSheetUrl="/cheat-sheets/addeventlistener-pattern/"
+    cheatSheetTitle="The addEventListener Pattern"
+>
+
+    <!-- ============================================================
+         SECTION 1: What You'll Learn
+         ============================================================ -->
+    <section class="content-section">
+        <h2 class="section-heading-centered">What You'll Learn at This Station</h2>
+
+        <div class="intro-box">
+            <p><strong>HAP's Discovery:</strong> A web page can have buttons, links, and interactive elements everywhere, but none of them do anything until you tell the browser to listen. I learned the three-part pattern that makes any element respond to any action &mdash; and discovered that the function you pass in has a name: a callback.</p>
+        </div>
+
+        <!-- 3 Insight cards -->
+        <div class="overview-grid mt-2">
+            <div class="insight-card">
+                <h3><span class="insight-icon">🔌</span> The Wiring</h3>
+                <p class="stat-large">addEventListener</p>
+                <p>The method that tells the browser: "Watch this element. When this event happens, run this function." Three parts: target, event type, callback.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">📞</span> The Callback</h3>
+                <p class="stat-large stat-teal">function(event) { }</p>
+                <p>A function you pass to another function to run later. Not called immediately &mdash; stored by the browser and invoked when the event fires.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">🎯</span> The Event Types</h3>
+                <p class="stat-large stat-brown">'click', 'submit', 'keydown'</p>
+                <p>The browser can listen for dozens of event types. Click is where most people start, but the pattern works for any of them.</p>
+            </div>
+        </div>
+
+        <!-- HAP's Confession -->
+        <div class="hap-note-callout">
+            <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1763230414/hap-broke-things_qtbum4.jpg"
+                alt="HAP surrounded by tangled code with an oops expression"
+                width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+            <div class="hap-note-content">
+                <h3>HAP's Confession:</h3>
+                <ul>
+                    <li>I clicked the status badge over and over, expecting something to happen. Nobody had told the browser to listen.</li>
+                    <li>I put addEventListener on the wrong element reference &mdash; I was targeting a variable that did not exist yet.</li>
+                    <li>I forgot to define my callback function before passing it to addEventListener. Got a "not defined" error and stared at it for ten minutes.</li>
+                    <li>I named my callback parameter 'e' because the AI did. Two days later, I could not remember what 'e' meant. Renamed it to 'event' and everything was clearer.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2: The addEventListener Pattern
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>The addEventListener Pattern</h2>
+
+            <p class="mb-2">Every addEventListener call has exactly three parts. Prof. Teeters' doorbell analogy helped me see the structure: the target is the button, the event type is the press, and the callback is the bell.</p>
+
+            <div class="analysis-grid">
+                <div class="analysis-point">
+                    <h3>1. The Target</h3>
+                    <p>The DOM element you want to watch. You get it with querySelector, just like in the DOM lab. This is the doorbell button &mdash; the thing the user interacts with.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>2. The Event Type</h3>
+                    <p>A string that tells the browser what action to listen for: <code>'click'</code>, <code>'submit'</code>, <code>'keydown'</code>, <code>'mouseover'</code>. This is what kind of press activates the bell.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>3. The Callback</h3>
+                    <p>The function that runs when the event happens. You pass it in &mdash; you do not call it yourself. The browser stores it and invokes it later. This is the bell itself.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Putting It Together</h3>
+                    <p><code>target.addEventListener(type, callback)</code> &mdash; that is the entire pattern. Every interactive feature on every website starts here.</p>
+                </div>
+            </div>
+
+            <!-- Prof. Teeters callout -->
+            <div class="hap-note-callout mt-2">
+                <div class="hap-note-content">
+                    <h3>Prof. Teeters:</h3>
+                    <p>"Think of it like a doorbell. The button has always been there. But until you wire it to a bell, pressing it does nothing. addEventListener is the wiring."</p>
+                </div>
+            </div>
+
+            <!-- Code example -->
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">addEventListener in action:</div>
+                <CodeBlock code={simpleListenerCode} lang="javascript" />
+                <p class="code-comment mt-1">Three parts: <code>statusBadge</code> is the target, <code>'click'</code> is the event type, and the function is the callback. When the badge is clicked, the browser runs the callback and toggles the 'active' class.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3: What Is a Callback?
+         Grace Hopper explains
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>What Is a Callback?</h2>
+
+            <p class="mb-2">I kept hearing the word "callback" and it confused me. I was passing a function into addEventListener, but I was not calling it. Grace Hopper cleared this up in her precise way.</p>
+
+            <!-- Grace Hopper callout -->
+            <div class="hap-note-callout hap-note-callout--grace mt-2">
+                <div class="hap-note-content">
+                    <h3>Grace Hopper:</h3>
+                    <p>"A callback is not executed. It is registered. The browser stores a reference to your function and invokes it when the event occurs. The distinction between calling a function and passing a function is fundamental."</p>
+                </div>
+            </div>
+
+            <p class="mt-2">That distinction &mdash; calling vs. passing &mdash; tripped me up more than once. Here is the difference:</p>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">Named callback function:</div>
+                <CodeBlock code={callbackNamedCode} lang="javascript" />
+                <p class="code-comment mt-1">The function <code>toggleStatus</code> is defined first, then passed to addEventListener by name. No parentheses &mdash; we are passing the function reference, not calling it.</p>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">The parentheses trap:</div>
+                <CodeBlock code={callbackMistakeCode} lang="javascript" />
+                <p class="code-comment mt-1">This was one of my worst mistakes. Adding parentheses calls the function immediately and passes its return value (undefined) to addEventListener. The event does nothing.</p>
+            </div>
+
+            <!-- HAP's breakthrough -->
+            <div class="hap-note-callout mt-2">
+                <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1763230331/hap-brain-explodes_wu0or8.jpg"
+                    alt="HAP with mind blown, realizing how callbacks work"
+                    width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+                <div class="hap-note-content">
+                    <h3>HAP's Breakthrough:</h3>
+                    <p>When my first click actually toggled the status badge, my mind was blown. I had been building DOM elements for a whole lab, but this was the first time the page responded to me. The badge changed color and I must have clicked it fifty times. 🟠</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION: Quick Reference
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">addEventListener Quick Reference</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>The Three-Part Pattern</h3>
+                    <p><code>target.addEventListener(eventType, callback)</code> &mdash; target is the element, event type is a string like <code>'click'</code>, and callback is the function that runs when the event fires.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>Callbacks Are Passed, Not Called</h3>
+                    <p>Write <code>addEventListener('click', toggleStatus)</code> with no parentheses. Adding <code>()</code> calls the function immediately and passes its return value instead.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>Common Event Types</h3>
+                    <p><code>'click'</code> for mouse clicks, <code>'submit'</code> for forms, <code>'keydown'</code> for keyboard input, <code>'change'</code> for dropdowns and checkboxes, <code>'input'</code> for text fields.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>Name Your Callback Parameter</h3>
+                    <p>Use <code>event</code> instead of <code>e</code> for clarity. The browser passes an event object to every callback &mdash; you will explore that object at the next station.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Transition to Station 2
+         ============================================================ -->
+    <section class="content-section">
+        <div class="hap-note-callout">
+            <div class="hap-note-content">
+                <p>I can make something happen on click now. But inside that callback, the browser is sending me something &mdash; an event object packed with information. What exactly is the browser telling me when an event fires? 🟠</p>
+            </div>
+        </div>
+    </section>
+
+</StationLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

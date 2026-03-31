@@ -1,0 +1,327 @@
+---
+/**
+ * Station 4: Bubbling Up
+ * Primary concept: Events bubble up through the DOM tree. Delegation means you
+ * listen on a parent instead of every child — this is how you handle dynamic content.
+ *
+ * Code role: Comparative — listener-per-card vs. delegation with .closest()
+ * Characters: HAP, Grace Hopper
+ */
+
+import StationLayout from '../../layouts/StationLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const introContent = `
+    <p><strong>Welcome to Station 4!</strong> After Station 3, I had a working robot card page &mdash; cards, a detail view, a form. I felt confident. So I added more robot cards. Then more. Then I wrote a loop to add listeners to every single card.</p>
+    <p class="mt-1">It worked! Until I added a card dynamically. That new card did nothing when I clicked it. No listener. I had wired up the old cards but completely missed the new one.</p>
+    <p class="mt-1">I tried fixing it by adding listeners inside the loop that created new cards. It got complicated fast. Something felt wrong about the approach.</p>
+    <p class="mt-1">That's when I discovered event bubbling &mdash; and realized the browser had been doing something useful all along that I had never noticed.</p>
+    <p class="mt-1">Let me show you how one listener on a parent container replaced a dozen listeners on individual cards... 🟠</p>
+`;
+
+// Section 2: How bubbling works
+const bubblingDemoCode = `// When you click the span inside a card...
+// The event fires on the span first, then bubbles UP:
+
+// 1. span.robot-name (where the click happened)
+// 2. div.robot-card (parent)
+// 3. div.card-container (grandparent)
+// 4. main
+// 5. body
+// 6. html
+// 7. document
+// 8. window
+
+// Every ancestor gets a chance to handle the event.
+// That's bubbling.`;
+
+// Section 3: Listener per card (the problem)
+const listenerPerCardCode = `// The approach I started with — a listener on every card
+const cards = document.querySelectorAll('.robot-card');
+
+cards.forEach(function(card) {
+  card.addEventListener('click', function(event) {
+    showDetail(card);
+  });
+});
+
+// This works for the cards that existed when the page loaded.
+// But when I added a new card dynamically later...
+
+const newCard = document.createElement('div');
+newCard.classList.add('robot-card');
+newCard.textContent = 'Unit 99';
+cardContainer.appendChild(newCard);
+
+// ...this new card has NO listener. Clicking it does nothing.
+// I would have to add a listener every time I create a card.`;
+
+// Section 3: Delegation (the solution)
+const delegationCode = `// One listener on the parent container handles all cards —
+// including ones that don't exist yet.
+
+const cardContainer = document.querySelector('.card-container');
+
+cardContainer.addEventListener('click', function(event) {
+  // event.target is whatever was actually clicked.
+  // It might be the card div, or a span inside the card.
+
+  // .closest() walks UP the DOM from event.target
+  // and finds the nearest ancestor matching the selector.
+  const card = event.target.closest('.robot-card');
+
+  // If the click happened outside any card, card is null.
+  if (!card) return;
+
+  showDetail(card);
+});
+
+// Now add a new card any time — it works automatically.
+const newCard = document.createElement('div');
+newCard.classList.add('robot-card');
+newCard.textContent = 'Unit 99';
+cardContainer.appendChild(newCard);
+// Clicking newCard triggers the container's listener. ✓`;
+
+// Section 4: The .closest() detail
+const closestCode = `// Why .closest() matters
+
+// Suppose a robot card looks like this:
+// <div class="robot-card">
+//   <span class="robot-name">Unit 42</span>
+//   <span class="robot-status">Online</span>
+// </div>
+
+cardContainer.addEventListener('click', function(event) {
+  console.log(event.target);
+  // If I clicked on "Unit 42" text:
+  //   event.target → <span class="robot-name">Unit 42</span>
+  //   NOT the card div!
+
+  // Without .closest(), this check would fail:
+  if (event.target.classList.contains('robot-card')) {
+    // Never true when clicking on a child span
+  }
+
+  // With .closest(), it walks UP until it finds the card:
+  const card = event.target.closest('.robot-card');
+  // Returns <div class="robot-card"> whether I clicked
+  // the card itself OR any element inside it.
+});`;
+---
+
+<StationLayout
+    stationNumber={4}
+    title="Bubbling Up"
+    subtitle="Event bubbling and delegation"
+    description="HAP discovers event bubbling and delegation — how one listener on a parent container handles all child elements, including ones added dynamically."
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1763230577/hap-juggles_v2zxeq.jpg"
+    avatarAlt="HAP juggling multiple robot cards, representing managing many event listeners at once"
+    introContent={introContent}
+    ogImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_1200,c_fill,g_auto/v1763230577/hap-juggles_v2zxeq.jpg"
+    nextStationTitle="Putting It Together"
+    footerReminder="One listener on the parent beats a dozen on the children. Bubbling is a feature, not a bug."
+    labName="The Living Page"
+    cheatSheetUrl="/cheat-sheets/event-bubbling-delegation/"
+    cheatSheetTitle="Event Bubbling and Delegation"
+>
+
+    <!-- ============================================================
+         SECTION 1: What You'll Learn
+         ============================================================ -->
+    <section class="content-section">
+        <h2 class="section-heading-centered">What You'll Learn at This Station</h2>
+
+        <div class="intro-box">
+            <p><strong>HAP's Discovery:</strong> I thought event listeners had to live on the exact element I wanted to watch. Turns out the browser tells every ancestor about every event &mdash; all the way up to the window. That behavior has a name: bubbling. And once I understood it, I stopped putting listeners on individual cards and started putting one listener on their container instead. That technique is called delegation, and it solved my dynamic content problem completely.</p>
+        </div>
+
+        <!-- 3 Insight cards -->
+        <div class="overview-grid mt-2">
+            <div class="insight-card">
+                <h3><span class="insight-icon">🫧</span> Bubbling</h3>
+                <p class="stat-large">Event travels up</p>
+                <p>When an event fires on an element, the browser fires it on every ancestor too &mdash; child, parent, grandparent, all the way to the window. The event "bubbles" up the tree.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">🎯</span> Delegation</h3>
+                <p class="stat-large stat-teal">Listen on the parent</p>
+                <p>Instead of adding a listener to every child element, add one listener to a parent container. Any click on any child bubbles up and triggers it &mdash; including dynamically added children.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">🔍</span> .closest()</h3>
+                <p class="stat-large stat-brown">Find the right ancestor</p>
+                <p><code>event.target</code> is the exact element clicked &mdash; often a span or icon inside the card, not the card itself. <code>.closest()</code> walks up the DOM to find the nearest matching ancestor.</p>
+            </div>
+        </div>
+
+        <!-- HAP's Confession -->
+        <div class="hap-note-callout">
+            <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1763230414/hap-broke-things_qtbum4.jpg"
+                alt="HAP surrounded by tangled code with an oops expression"
+                width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+            <div class="hap-note-content">
+                <h3>HAP's Confession:</h3>
+                <ul>
+                    <li>I added a click listener to every card inside a <code>forEach</code> loop. It worked great &mdash; until I added a card dynamically. That new card did nothing when clicked. My loop had already finished running.</li>
+                    <li>My first delegation attempt seemed broken. I clicked a card and nothing happened. Then I logged <code>event.target</code> and saw it was the <code>&lt;span&gt;</code> inside the card, not the card itself. I had been checking <code>event.target.classList.contains('robot-card')</code> and it was never true. I needed <code>.closest()</code>.</li>
+                    <li>I thought bubbling was a bug for a while. I kept getting events firing in places I did not expect. Once I learned the behavior was intentional and had a use, I completely changed how I thought about event handling.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2: How Event Bubbling Works
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>How Event Bubbling Works</h2>
+
+            <p class="mb-2">When I click any element, the browser does not stop there. It fires the event on that element first, then fires it on the parent, then the grandparent, and keeps going all the way up to the <code>window</code>. Every ancestor in the chain gets a turn.</p>
+
+            <div class="analysis-grid">
+                <div class="analysis-point">
+                    <h3>Where It Starts</h3>
+                    <p>The element you actually clicked is called the <strong>event target</strong>. The event fires there first. If you click a <code>&lt;span&gt;</code> inside a <code>&lt;div&gt;</code>, the span is the target.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Where It Goes</h3>
+                    <p>After the target, the event travels up &mdash; parent, grandparent, great-grandparent, all the way to <code>document</code> and <code>window</code>. Any element with a matching listener along the way will trigger it.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>event.target vs. event.currentTarget</h3>
+                    <p><code>event.target</code> is always the element that was originally clicked. <code>event.currentTarget</code> is the element where the current listener is attached. When using delegation, these are different.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Stopping the Bubble</h3>
+                    <p><code>event.stopPropagation()</code> halts bubbling at the current element. I learned to use this carefully &mdash; stopping propagation can break delegation patterns elsewhere on the page.</p>
+                </div>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">The bubbling path:</div>
+                <CodeBlock code={bubblingDemoCode} lang="javascript" />
+                <p class="code-comment mt-1">A single click on a <code>span.robot-name</code> triggers listeners on every ancestor all the way to <code>window</code>. The container's listener fires because the event bubbles up to it.</p>
+            </div>
+
+            <!-- Grace Hopper callout -->
+            <div class="hap-note-callout hap-note-callout--grace mt-2">
+                <div class="hap-note-content">
+                    <h3>Grace Hopper:</h3>
+                    <p>"In Station 2, I told you that <code>event.target</code> and <code>event.currentTarget</code> differ when event propagation is involved. Now you see why that distinction matters. When a delegated listener fires on the container, <code>event.target</code> is the element that was clicked &mdash; which may be deep inside the container &mdash; while <code>event.currentTarget</code> is the container itself."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3: Listener Per Card vs. Delegation
+         Comparative code section
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Listener Per Card vs. Delegation</h2>
+
+            <p class="mb-2">Here is the difference between the two approaches. Both work for static cards. Only delegation handles dynamic ones.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">The problem: a listener on every card</div>
+                <CodeBlock code={listenerPerCardCode} lang="javascript" />
+                <p class="code-comment mt-1">This approach breaks the moment a card is added after the loop runs. There is no way for the existing listeners to cover new elements &mdash; each new card needs its own listener added at creation time, which makes the code increasingly tangled.</p>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">The solution: one delegated listener on the container</div>
+                <CodeBlock code={delegationCode} lang="javascript" />
+                <p class="code-comment mt-1">The container's listener exists before any cards are added and keeps working after new ones appear. Because clicks bubble up from any card &mdash; new or old &mdash; the container always catches them.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 4: The .closest() Pattern
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>The .closest() Pattern</h2>
+
+            <p class="mb-2">My first delegation attempt looked right but did not work. The problem was <code>event.target</code>. When I clicked the robot's name text, the target was the <code>&lt;span&gt;</code> inside the card &mdash; not the card itself. Checking for the card's class on <code>event.target</code> always came back false.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Why event.target is not always the card:</div>
+                <CodeBlock code={closestCode} lang="javascript" />
+                <p class="code-comment mt-1"><code>.closest(selector)</code> starts at <code>event.target</code> and walks up the DOM tree until it finds a matching element or runs out of ancestors. It returns <code>null</code> if nothing matches &mdash; which is how I guard against clicks on the container itself that miss all cards.</p>
+            </div>
+
+            <div class="hap-note-callout mt-2">
+                <div class="hap-note-content">
+                    <h3>🟠 The Guard Clause</h3>
+                    <p>Every delegated listener I write now starts with <code>const card = event.target.closest('.robot-card'); if (!card) return;</code>. If the click landed outside any card (on the container's padding, for example), <code>.closest()</code> returns <code>null</code> and the early return stops the handler from running with bad data. That one-liner saved me from several confusing bugs.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION: Quick Reference
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">Event Bubbling and Delegation Quick Reference</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>Events Bubble Up</h3>
+                    <p>A click on any element fires that event on the element, then its parent, then grandparent, all the way to <code>window</code>. Any ancestor with a matching listener will respond.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>Delegation: One Listener on the Parent</h3>
+                    <p>Attach one listener to a container instead of one to each child. Clicks on any child bubble up and trigger the container's listener &mdash; including clicks on dynamically added children.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>Use .closest() to Identify the Card</h3>
+                    <p><code>event.target.closest('.robot-card')</code> walks up the DOM from the clicked element and returns the nearest ancestor matching that selector. Returns <code>null</code> if no match is found.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>Always Guard Against Null</h3>
+                    <p>After calling <code>.closest()</code>, check the result before using it: <code>if (!card) return;</code>. Clicks on the container background return <code>null</code> and should be ignored.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Transition to Station 5
+         ============================================================ -->
+    <section class="content-section">
+        <div class="hap-note-callout">
+            <div class="hap-note-content">
+                <p>I now have a fully interactive robot card page &mdash; clickable cards, view switching, a working form, and delegated events that handle dynamically added cards without any extra wiring. The page feels alive. At Station 5, I put all of these patterns together into one complete mini app. 🟠</p>
+            </div>
+        </div>
+    </section>
+
+</StationLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

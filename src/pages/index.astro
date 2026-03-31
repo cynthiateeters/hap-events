@@ -1,107 +1,176 @@
 ---
 /**
- * Placeholder Hub Page
- *
- * Replace this file with content from src/templates/hub-template.astro
- *
- * GETTING STARTED:
- * 1. Read docs/designing-labs/hap-narrative-and-scene-design.md
- * 2. Fill out a station blueprint for each station (docs/reference-cards/station-blueprint-template.md)
- * 3. Copy src/templates/hub-template.astro to this location
- * 4. Replace all [PLACEHOLDER_*] markers with your content
+ * Hub Page - HAP's Learning Lab: The Living Page
+ * Events and Interactivity
  */
 
 import MainLayout from '../layouts/MainLayout.astro';
 
 const introContent = `
-    <p><strong>Welcome to your new HAP Learning Lab!</strong></p>
-    <p>This is a placeholder page. To get started, copy the hub template from
-    <code>src/templates/hub-template.astro</code> and replace this file.</p>
-    <p class="mt-1">Check out the documentation in the <code>docs/</code> folder for guidance
-    on creating your learning lab content. 🟠</p>
+    <p><strong>My robot card page looked amazing after the DOM lab. But when I clicked on it... nothing happened.</strong></p>
+    <p>I could read from the page, I could change it, I could even build new elements. But the page never responded to me. It was like talking to someone who never answers back.</p>
+    <p class="mt-1">Prof. Teeters told me that the DOM is the structure, but events are what bring it to life. Across these six stations, I learned how to make a page listen, respond, switch views, handle forms, and even catch problems in AI-generated code.</p>
+    <p class="mt-1">Come see how my robot card went from a page that exists to a page that responds. 🟠</p>
 `;
 ---
 
 <MainLayout
-    title="HAP's Learning Lab | Getting Started"
-    description="A placeholder page for your new HAP Learning Lab. Replace with your content."
+    title="The Living Page | HAP's Learning Lab"
+    description="HAP learns how DOM events bring web pages to life — addEventListener, callbacks, view switching, forms, delegation, and AI code review."
+    ogImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_1200,c_fill,g_auto/v1759495998/hap-waving_dgzacg.jpg"
     headerTitle="HAP's Learning Lab"
-    headerSubtitle="Your Learning Lab Topic Here"
+    headerSubtitle="The Living Page — Events and Interactivity"
     avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1759495998/hap-waving_dgzacg.jpg"
     avatarAlt="HAP waving hello"
     introContent={introContent}
+    showIntroImage={false}
+    introImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_240,c_limit/v1759495998/hap-waving_dgzacg.jpg"
+    introImageAlt="HAP waving hello"
     showNavigation={false}
-    footerReminder="Start by reading the documentation in docs/designing-labs/"
+    footerReminder="Events are the bridge between a page that exists and a page that responds."
 >
 
+    <!-- ============================================================
+         About This Lab Section
+         ============================================================ -->
     <section class="content-section">
         <div class="topic-section">
-            <h2>Getting Started</h2>
+            <h2>About HAP's Learning Lab</h2>
 
-            <div class="analysis-grid">
+            <div class="analysis-grid analysis-grid--two-col">
                 <div class="analysis-point">
-                    <h3>📚 Step 1: Read the docs</h3>
-                    <p>Start with <code>docs/designing-labs/hap-narrative-and-scene-design.md</code></p>
-                    <p class="mt-1">This will help you understand HAP's voice and the station structure.</p>
+                    <h3>What I Learned</h3>
+                    <p>How to make a web page respond to clicks, form submissions, and user actions using DOM events.</p>
+                    <p class="mt-1">From a single addEventListener to a full mini SPA with delegated events, view switching, and form handling.</p>
                 </div>
 
                 <div class="analysis-point">
-                    <h3>📝 Step 2: Plan your stations</h3>
-                    <p>Use the blueprint template in <code>docs/reference-cards/station-blueprint-template.md</code></p>
-                    <p class="mt-1">Fill out one blueprint for each of your 6 stations before writing content.</p>
+                    <h3>How I Practiced</h3>
+                    <p>I kept building on my Robot ID Card from the DOM lab. Each station added a new layer of interactivity.</p>
+                    <p class="mt-1">By the end, the card responds to clicks, switches views, handles a notes form, and works with dynamically added cards.</p>
                 </div>
 
                 <div class="analysis-point">
-                    <h3>🏗️ Step 3: Create your pages</h3>
-                    <p>Copy templates from <code>src/templates/</code> to <code>src/pages/</code></p>
-                    <p class="mt-1">Replace all <code>[PLACEHOLDER_*]</code> markers with your content.</p>
+                    <h3>My Philosophy</h3>
+                    <p>I made a lot of mistakes. Clicked things expecting magic. Forgot to listen. Put listeners on the wrong elements. Lost my DOM changes to a page reload.</p>
+                    <p class="mt-1">Every mistake taught me something I could not have learned from reading documentation alone.</p>
                 </div>
 
                 <div class="analysis-point">
-                    <h3>✅ Step 4: Validate</h3>
-                    <p>Use the Claude Skills in <code>skills/</code> to validate your content</p>
-                    <p class="mt-1">Run <code>npm run build</code> to check for errors.</p>
+                    <h3>My Advice</h3>
+                    <p>Start with one addEventListener. Get that working. Then add the next thing. I tried to do too much at once and confused myself.</p>
+                    <p class="mt-1">And when you use AI to generate event code, read it carefully. I learned the hard way that AI does not know your app's architecture. 🟠</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="content-section">
-        <div class="tips-container">
-            <h2 class="section-heading-centered">🎓 Quick Reference</h2>
+    <!-- ============================================================
+         Learning Stations Grid
+         ============================================================ -->
+    <div class="content-container">
+        <section class="content-section">
+            <h2 class="section-heading-centered">Learning Stations</h2>
+            <nav aria-label="Learning stations">
+                <div class="overview-grid">
 
-            <div class="tip-card">
-                <div class="tip-number">1</div>
-                <div>
-                    <h3>Hub template</h3>
-                    <p><code>src/templates/hub-template.astro</code> → <code>src/pages/index.astro</code></p>
-                </div>
-            </div>
+                    <!-- Station 1 -->
+                    <a href="/stations/station1/" class="insight-card station-card-link">
+                        <h3><span class="insight-icon">👂</span> Station 1: Listening</h3>
+                        <p><strong>Focus:</strong> addEventListener and callbacks</p>
+                        <p class="station-description">I wanted my robot's status badge to toggle when I clicked it. Nothing happened. Nobody had told the browser to listen. Prof. Teeters compared it to a doorbell with no wiring, and that's when addEventListener made sense.</p>
+                        <p class="station-cta">&rarr; Visit Station 1</p>
+                    </a>
 
-            <div class="tip-card">
-                <div class="tip-number">2</div>
-                <div>
-                    <h3>Station template</h3>
-                    <p><code>src/templates/station-template.astro</code> → <code>src/pages/stations/station[1-6].astro</code></p>
-                </div>
-            </div>
+                    <!-- Station 2 -->
+                    <a href="/stations/station2/" class="insight-card station-card-link">
+                        <h3><span class="insight-icon">🔍</span> Station 2: What Just Happened?</h3>
+                        <p><strong>Focus:</strong> The event object</p>
+                        <p class="station-description">I added console.log(event) inside my callback and got overwhelmed by the object the browser sent back. Turns out, the event object is a detailed report of what happened, where, and to what element.</p>
+                        <p class="station-cta">&rarr; Visit Station 2</p>
+                    </a>
 
-            <div class="tip-card">
-                <div class="tip-number">3</div>
-                <div>
-                    <h3>HAP images</h3>
-                    <p>See the image inventory in <code>skills/hap-image-validation/</code></p>
-                </div>
-            </div>
+                    <!-- Station 3 -->
+                    <a href="/stations/station3/" class="insight-card station-card-link">
+                        <h3><span class="insight-icon">🔄</span> Station 3: Swapping Views</h3>
+                        <p><strong>Focus:</strong> View switching, forms, and preventDefault</p>
+                        <p class="station-description">I wanted to show a detail view when a card was clicked. Prof. Teeters told me I was not navigating to a new page &mdash; I was rearranging the room. Then my form submitted and the page reloaded, erasing everything.</p>
+                        <p class="station-cta">&rarr; Visit Station 3</p>
+                    </a>
 
-            <div class="tip-card">
-                <div class="tip-number">4</div>
-                <div>
-                    <h3>Development server</h3>
-                    <p>Run <code>npm run dev</code> to start the development server at localhost:4321</p>
+                    <!-- Station 4 -->
+                    <a href="/stations/station4/" class="insight-card station-card-link">
+                        <h3><span class="insight-icon">🫧</span> Station 4: Bubbling Up</h3>
+                        <p><strong>Focus:</strong> Event bubbling and delegation</p>
+                        <p class="station-description">Adding a click listener to every single card felt tedious, and when I dynamically added a new card, it did not respond at all. One listener on the parent container, using event.target, solved everything.</p>
+                        <p class="station-cta">&rarr; Visit Station 4</p>
+                    </a>
+
+                    <!-- Station 5 -->
+                    <a href="/stations/station5/" class="insight-card station-card-link">
+                        <h3><span class="insight-icon">🏗️</span> Station 5: Putting It Together</h3>
+                        <p><strong>Focus:</strong> Building a mini SPA with all event patterns</p>
+                        <p class="station-description">Everything from Stations 1 through 4 came together in a complete mini robot card app. Delegation, view switching, forms, dynamic cards. No mentor needed &mdash; I built this one on my own.</p>
+                        <p class="station-cta">&rarr; Visit Station 5</p>
+                    </a>
+
+                    <!-- Station 6 -->
+                    <a href="/stations/station6/" class="insight-card station-card-link">
+                        <h3><span class="insight-icon">🤖</span> Station 6: AI and Your Event-Driven Code</h3>
+                        <p><strong>Focus:</strong> AI code review and defense in depth</p>
+                        <p class="station-description">I asked AI for help adding features, and discovered it does not know my app's architecture. I caught one mistake. Grace caught another I missed. That led me to a four-layer defense system.</p>
+                        <p class="station-cta">&rarr; Visit Station 6</p>
+                    </a>
+
                 </div>
+            </nav>
+        </section>
+    </div>
+
+    <!-- ============================================================
+         Reference / Cheat Sheets Section
+         ============================================================ -->
+    <div class="content-container">
+        <section class="content-section">
+            <h2 class="section-heading-centered">Reference</h2>
+            <div class="overview-grid">
+
+                <a href="/cheat-sheets/addeventlistener-pattern/" class="insight-card station-card-link">
+                    <h3>The addEventListener Pattern</h3>
+                    <p>Syntax breakdown, the three parts, what a callback is, and common event types.</p>
+                </a>
+
+                <a href="/cheat-sheets/event-object/" class="insight-card station-card-link">
+                    <h3>The Event Object</h3>
+                    <p>Key properties: target, currentTarget, type, preventDefault. What each returns.</p>
+                </a>
+
+                <a href="/cheat-sheets/view-switching-pattern/" class="insight-card station-card-link">
+                    <h3>The View-Switching Pattern</h3>
+                    <p>Hide/show recipe, the .hidden class approach, preventDefault, and reading form data.</p>
+                </a>
+
+                <a href="/cheat-sheets/event-bubbling-delegation/" class="insight-card station-card-link">
+                    <h3>Event Bubbling and Delegation</h3>
+                    <p>How bubbling works, why delegation saves work, and the .closest() pattern.</p>
+                </a>
+
+                <a href="/cheat-sheets/events-quick-reference/" class="insight-card station-card-link">
+                    <h3>Events Quick Reference</h3>
+                    <p>Complete reference card of all event patterns from Stations 1 through 4.</p>
+                </a>
+
+                <a href="/cheat-sheets/defense-in-depth-playbook/" class="insight-card station-card-link">
+                    <h3>Your Defense-in-Depth Playbook</h3>
+                    <p>The four layers: AGENTS.md, ESLint plugins, Husky, and Copilot code review.</p>
+                </a>
+
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
 </MainLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

@@ -1,0 +1,329 @@
+---
+/**
+ * Station 3: Swapping Views
+ * Primary concept: Show/hide content containers to simulate multiple views
+ * on a single page. Also covers forms and preventDefault.
+ *
+ * Code role: Illustrative
+ * Characters: HAP, Prof. Teeters, Grace Hopper
+ */
+
+import StationLayout from '../../layouts/StationLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const introContent = `
+    <p><strong>Welcome to Station 3!</strong> My robot cards were working &mdash; I could click them and handle the event. But I wanted clicking a card to reveal a full detail view, with a back button that returned to the list. The only way I knew to show a different page was to make a second HTML file.</p>
+    <p class="mt-1">Prof. Teeters stopped me before I opened a new tab. "You're not navigating to a new page," he said. "You're rearranging the room."</p>
+    <p class="mt-1">That one sentence changed how I think about single-page interactions. The content is already there &mdash; I just need to control which parts are visible. And when I added a form to the detail view, I discovered a second trap: the browser's default behavior.</p>
+    <p class="mt-1">Let me show you how I learned to swap views and tame form submissions... 🟠</p>
+`;
+
+// == View switching code ==
+const hiddenClassHtmlCode = `<!-- Two containers — only one visible at a time -->
+<div id="summary-view">
+  <div class="robot-card" data-robot-id="r1">
+    <h2>Unit R-7</h2>
+    <p>Status: Active</p>
+  </div>
+</div>
+
+<div id="detail-view" class="hidden">
+  <button id="back-btn">Back to list</button>
+  <h2 id="detail-name"></h2>
+  <p id="detail-status"></p>
+</div>`;
+
+const hiddenClassCssNote = `/* Add this to your stylesheet — one rule does all the hiding */
+.hidden {
+  display: none;
+}`;
+
+const viewSwitchCode = `const summaryView = document.querySelector('#summary-view');
+const detailView  = document.querySelector('#detail-view');
+const backBtn     = document.querySelector('#back-btn');
+const detailName  = document.querySelector('#detail-name');
+
+// Show detail, hide summary
+document.querySelector('.robot-card').addEventListener('click', function(event) {
+  const card = event.currentTarget;
+
+  // Populate detail view from the card's content
+  detailName.textContent = card.querySelector('h2').textContent;
+
+  // Swap visibility
+  summaryView.classList.add('hidden');
+  detailView.classList.remove('hidden');
+});
+
+// Show summary, hide detail
+backBtn.addEventListener('click', function() {
+  detailView.classList.add('hidden');
+  summaryView.classList.remove('hidden');
+});`;
+
+// == Forms and preventDefault ==
+const formDefaultCode = `// Without preventDefault — the page reloads on submit
+const notesForm = document.querySelector('#notes-form');
+
+notesForm.addEventListener('submit', function(event) {
+  // Page reloads here. All DOM changes are lost.
+  console.log('This never prints because the page reloaded first');
+});`;
+
+const formPreventDefaultCode = `// With preventDefault — the page stays, we handle the data
+const notesForm = document.querySelector('#notes-form');
+
+notesForm.addEventListener('submit', function(event) {
+  event.preventDefault(); // Stop the browser's default reload
+
+  // Now we can read the form data
+  const formData = new FormData(notesForm);
+  const note = formData.get('note-text');
+
+  console.log('Note saved:', note);
+  // Update the DOM, show a confirmation, do anything we want
+});`;
+
+const formMistakeCode = `// MISTAKE: Listening on the submit button instead of the form
+const submitBtn = document.querySelector('#submit-btn');
+
+submitBtn.addEventListener('click', function(event) {
+  event.preventDefault(); // This prevents the click, not the submit
+  // The form may still submit via keyboard (Enter key)
+});
+
+// CORRECT: Listen on the form element for the 'submit' event
+const notesForm = document.querySelector('#notes-form');
+
+notesForm.addEventListener('submit', function(event) {
+  event.preventDefault(); // Catches all submission paths: click, Enter, etc.
+});`;
+---
+
+<StationLayout
+    stationNumber={3}
+    title="Swapping Views"
+    subtitle="View switching, forms, and preventDefault"
+    description="HAP builds a single-page detail view by toggling a .hidden class, then tames form reloads with preventDefault. One page, many views."
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1763230755/hap-page-swirl_jad9ji.jpg"
+    avatarAlt="HAP surrounded by swirling page panels, learning to swap views"
+    introContent={introContent}
+    ogImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_1200,c_fill,g_auto/v1763230755/hap-page-swirl_jad9ji.jpg"
+    nextStationTitle="Bubbling Up"
+    footerReminder="One page, many views. classList.add('hidden') and classList.remove('hidden') are all you need."
+    labName="The Living Page"
+    cheatSheetUrl="/cheat-sheets/view-switching-pattern/"
+    cheatSheetTitle="The View-Switching Pattern"
+>
+
+    <!-- ============================================================
+         SECTION 1: What You'll Learn
+         ============================================================ -->
+    <section class="content-section">
+        <h2 class="section-heading-centered">What You'll Learn at This Station</h2>
+
+        <div class="intro-box">
+            <p><strong>HAP's Discovery:</strong> A single HTML page can feel like multiple pages if I control which containers are visible. I learned to keep all my views in the DOM and toggle a <code>.hidden</code> class to show or hide them. Then I ran into the browser's default form behavior and had to learn <code>preventDefault()</code> to stop the page from reloading every time a form was submitted.</p>
+        </div>
+
+        <div class="overview-grid mt-2">
+            <div class="insight-card">
+                <h3><span class="insight-icon">🔀</span> View Switching</h3>
+                <p class="stat-large">.hidden class</p>
+                <p>Two containers in the HTML, one visible at a time. Toggle the <code>.hidden</code> class to move between them. This is how single-page apps work at their core.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">🛑</span> preventDefault</h3>
+                <p class="stat-large stat-teal">event.preventDefault()</p>
+                <p>Stops the browser's built-in response to an event &mdash; like reloading the page when a form submits. Call it first, before reading or processing anything.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">📝</span> Reading Form Data</h3>
+                <p class="stat-large stat-brown">new FormData(form)</p>
+                <p>After stopping the reload, read the form's values with <code>FormData</code>. Each input's <code>name</code> attribute becomes a key.</p>
+            </div>
+        </div>
+
+        <!-- HAP's Confession -->
+        <div class="hap-note-callout">
+            <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1763230414/hap-broke-things_qtbum4.jpg"
+                alt="HAP surrounded by tangled code with an oops expression"
+                width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+            <div class="hap-note-content">
+                <h3>HAP's Confession:</h3>
+                <ul>
+                    <li>I started creating a second HTML file for the detail view. Prof. Teeters stopped me. All the content lives on one page &mdash; I just control what is visible.</li>
+                    <li>I used <code>element.style.display = 'none'</code> inline instead of toggling a CSS class. It worked, but undoing it meant memorizing what display value to restore. A <code>.hidden</code> class handles both directions cleanly.</li>
+                    <li>I forgot to hide the summary view before showing the detail view. Both appeared at once. The order matters: add <code>.hidden</code> to the outgoing view, then remove it from the incoming one.</li>
+                    <li>I submitted my first form, the page reloaded, and all my DOM changes vanished. Spent fifteen minutes wondering why my JavaScript "stopped working." The page had simply restarted.</li>
+                    <li>I put the submit listener on the submit button instead of the form element. Keyboard users who pressed Enter to submit bypassed my handler entirely.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2: The View-Switching Pattern
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>The View-Switching Pattern</h2>
+
+            <p class="mb-2">The pattern has three ingredients: two container elements in the HTML, a <code>.hidden</code> CSS rule that sets <code>display: none</code>, and click handlers that add and remove that class. Prof. Teeters' framing helped me see it clearly.</p>
+
+            <!-- Prof. Teeters callout -->
+            <div class="hap-note-callout mt-2">
+                <div class="hap-note-content">
+                    <h3>Prof. Teeters:</h3>
+                    <p>"You're not navigating to a new page. You're rearranging the room."</p>
+                </div>
+            </div>
+
+            <p class="mt-2">The room analogy stuck. Everything is already in the room &mdash; some furniture is behind a curtain. Showing the detail view means pulling back the curtain on one area and drawing it across another.</p>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">Two-view HTML structure:</div>
+                <CodeBlock code={hiddenClassHtmlCode} lang="html" />
+                <p class="code-comment mt-1">The detail view starts with the <code>hidden</code> class applied. The summary view is visible by default. Both containers exist in the DOM from page load.</p>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">The .hidden CSS rule (add to your stylesheet):</div>
+                <CodeBlock code={hiddenClassCssNote} lang="javascript" />
+                <p class="code-comment mt-1">One rule in the stylesheet does all the work. Toggling a class is cleaner than setting inline styles because it separates concerns: JavaScript manages state, CSS manages appearance.</p>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">Swapping between views:</div>
+                <CodeBlock code={viewSwitchCode} lang="javascript" />
+                <p class="code-comment mt-1">Add <code>.hidden</code> to the outgoing view and remove it from the incoming one. The back button does the reverse. This is the complete pattern &mdash; all SPA view switching is a variation of this.</p>
+            </div>
+
+            <div class="hap-note-callout mt-2">
+                <div class="hap-note-content">
+                    <h3>🟠 The Breakthrough:</h3>
+                    <p>When I clicked a robot card and the detail view slid into place, I stopped and looked at the URL bar. It had not changed. It was still one page. "It's one page, but it feels like two." That's exactly what Prof. Teeters meant by rearranging the room.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3: Forms and preventDefault
+         Grace Hopper explains
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Forms and preventDefault</h2>
+
+            <p class="mb-2">The robot detail view had a small form for saving notes. I added a submit listener, typed a note, pressed Enter, and watched the page reload and lose everything. The event had fired &mdash; the browser had also done what browsers have done with forms since before JavaScript existed: sent a request and reloaded.</p>
+
+            <div class="analysis-grid">
+                <div class="analysis-point">
+                    <h3>The Browser's Default</h3>
+                    <p>Form submission was designed to send data to a server and reload the page with the response. This behavior predates JavaScript's role in form handling and runs automatically unless stopped.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>preventDefault()</h3>
+                    <p>A method on the event object. Calling it tells the browser: "I will handle this. Do not do the default behavior." For forms, that means no reload. For links, that means no navigation.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Listen on the Form</h3>
+                    <p>The submit event fires on the <code>&lt;form&gt;</code> element, not the submit button. Listening on the button only catches mouse clicks &mdash; pressing Enter in a text field also submits the form and would bypass a button listener.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Reading Form Values</h3>
+                    <p><code>new FormData(formElement)</code> collects all named inputs. Use <code>formData.get('fieldName')</code> to read a specific input's value. The input must have a <code>name</code> attribute.</p>
+                </div>
+            </div>
+
+            <!-- Grace Hopper callout -->
+            <div class="hap-note-callout hap-note-callout--grace mt-2">
+                <div class="hap-note-content">
+                    <h3>Grace Hopper:</h3>
+                    <p>"The browser's default behavior predates JavaScript's role in form handling. <code>preventDefault()</code> is not a workaround &mdash; it is the intended mechanism for JavaScript-controlled forms."</p>
+                </div>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">Without preventDefault — the reload trap:</div>
+                <CodeBlock code={formDefaultCode} lang="javascript" />
+                <p class="code-comment mt-1">The page reloads before any code after the listener call can run. All DOM state is lost. This is exactly what happened to me the first time.</p>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">With preventDefault — the correct pattern:</div>
+                <CodeBlock code={formPreventDefaultCode} lang="javascript" />
+                <p class="code-comment mt-1">Call <code>event.preventDefault()</code> as the first line in the submit handler. Then read the data, update the DOM, show confirmations &mdash; whatever the application needs.</p>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">The button vs. form listener mistake:</div>
+                <CodeBlock code={formMistakeCode} lang="javascript" />
+                <p class="code-comment mt-1">The <code>'submit'</code> event fires on the <code>&lt;form&gt;</code> element and covers every submission path. Listening on the button only catches clicks.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION: Quick Reference
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">View Switching Quick Reference</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>One Page, Many Views</h3>
+                    <p>Put all view containers in the HTML. Start with one visible and the rest <code>.hidden</code>. Toggle the class in response to events. The URL does not change &mdash; the DOM does.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>The .hidden Class Recipe</h3>
+                    <p>Add <code>.hidden &#123; display: none; &#125;</code> to the stylesheet. To show a view: <code>view.classList.remove('hidden')</code>. To hide it: <code>view.classList.add('hidden')</code>. Always hide the outgoing view before revealing the incoming one.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>preventDefault on Forms</h3>
+                    <p>Always call <code>event.preventDefault()</code> as the first line of a submit handler. Always listen on the <code>&lt;form&gt;</code> element, not the submit button. The submit event fires for all submission paths.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>Reading Form Data</h3>
+                    <p><code>const data = new FormData(formElement)</code> then <code>data.get('inputName')</code>. Each input needs a <code>name</code> attribute for <code>FormData</code> to pick it up.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Transition to Station 4
+         ============================================================ -->
+    <section class="content-section">
+        <div class="hap-note-callout">
+            <div class="hap-note-content">
+                <p>I can switch views and handle forms. But my Robot ID Card page has dozens of cards now. Do I really need to attach a separate click listener to every single one? There has to be a smarter way to handle a whole group of elements at once. 🟠</p>
+            </div>
+        </div>
+    </section>
+
+</StationLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

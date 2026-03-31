@@ -11,9 +11,9 @@ To create a new lab, fork this repository and customize.
 ## Commands
 
 ```bash
-npm run dev        # Start dev server at localhost:4321
-npm run build      # Production build to dist/
-npm run preview    # Preview production build
+bun run dev        # Start dev server at localhost:4321
+bun run build      # Production build to dist/
+bun run preview    # Preview production build
 ```
 
 ## Architecture

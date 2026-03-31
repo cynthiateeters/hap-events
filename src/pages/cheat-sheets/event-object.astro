@@ -1,0 +1,220 @@
+---
+/**
+ * Cheat Sheet: The Event Object
+ * Companion reference for Station 2
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const keyPropertiesCode = `// Access event properties inside any callback
+element.addEventListener('click', function(event) {
+  event.target         // The element that was clicked (DOM element)
+  event.currentTarget  // The element the listener is attached to
+  event.type           // "click", "submit", "keydown", etc.
+  event.timeStamp      // Milliseconds since page load when event fired
+});`;
+
+const targetDataCode = `// event.target is a live DOM element — use DOM properties on it
+element.addEventListener('click', function(event) {
+  event.target.textContent  // The visible text of the clicked element
+  event.target.id           // The element's id attribute
+  event.target.className    // The element's class attribute (as a string)
+  event.target.dataset      // An object of all data-* attributes
+  event.target.tagName      // "BUTTON", "DIV", "A", etc. (always uppercase)
+});
+
+// Example: read a data attribute
+// <button data-robot-id="r7">Unit R-7</button>
+element.addEventListener('click', function(event) {
+  const robotId = event.target.dataset.robotId; // "r7"
+  console.log(robotId);
+});`;
+
+const targetVsCurrentCode = `// target  = where the event originated (the clicked element)
+// currentTarget = where the listener is attached
+
+const container = document.querySelector('.card-list');
+
+container.addEventListener('click', function(event) {
+  console.log(event.target);        // <span> or <h2> inside a card
+  console.log(event.currentTarget); // .card-list (always the container)
+});
+
+// When the listener and the click are on the same element, they are equal:
+const btn = document.querySelector('#my-btn');
+btn.addEventListener('click', function(event) {
+  console.log(event.target === event.currentTarget); // true
+});`;
+
+const preventDefaultCode = `// event.preventDefault() — stop the browser's default behavior
+// Common uses:
+
+// 1. Stop a form from reloading the page
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+  // Now handle the data yourself
+});
+
+// 2. Stop a link from navigating
+link.addEventListener('click', function(event) {
+  event.preventDefault();
+  // Handle routing yourself
+});
+
+// Note: call it FIRST, before any other logic in the handler`;
+
+const logPatternCode = `// Exploratory pattern: log first, then extract
+element.addEventListener('click', function(event) {
+  console.log(event);              // See everything available
+  console.log(event.target);      // See the element
+  console.log(event.type);        // Confirm the event type
+
+  // Once you know what's there, extract what you need:
+  const id = event.target.dataset.id;
+  const label = event.target.textContent;
+});`;
+---
+
+<MainLayout
+    title="The Event Object | HAP's Learning Lab"
+    description="Quick reference for the event object: key properties, event.target vs currentTarget, preventDefault, and reading data attributes from clicked elements."
+    headerTitle="The Event Object"
+    headerSubtitle="Quick Reference"
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1759497938/HAP-learner_dvehmt.jpg"
+    avatarAlt="HAP studying and taking notes"
+    introContent="<p>Everything I learned about the event object at Station 2, organized for quick lookup. Key properties, how to read data from <code>event.target</code>, the difference between <code>target</code> and <code>currentTarget</code>, and when to call <code>preventDefault()</code>. 🟠</p>"
+    showNavigation={false}
+    footerReminder="event.target is which element. event.type is what happened. Those two answer most questions."
+>
+
+    <!-- Back link to Station 2 -->
+    <section class="content-section">
+        <p><a href="/stations/station2/">&larr; Back to Station 2: What Just Happened?</a></p>
+    </section>
+
+    <!-- ============================================================
+         Key Properties
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">Key Properties at a Glance</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">🎯</div>
+                <div>
+                    <h3>event.target</h3>
+                    <p>The element the user actually interacted with. A live DOM element &mdash; all DOM properties are available on it. The most-used property in everyday event handling.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">📌</div>
+                <div>
+                    <h3>event.currentTarget</h3>
+                    <p>The element the listener is attached to. When the listener is on a parent container and the user clicks a child, <code>currentTarget</code> is always the parent. Equal to <code>target</code> only when the clicked element is also the listener's element.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">🏷️</div>
+                <div>
+                    <h3>event.type</h3>
+                    <p>A string: <code>"click"</code>, <code>"submit"</code>, <code>"keydown"</code>, etc. Useful in shared handlers that respond to multiple event types.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">🛑</div>
+                <div>
+                    <h3>event.preventDefault()</h3>
+                    <p>A method (not a property). Stops the browser's built-in behavior for this event: form reload, link navigation, etc. Call it as the first line of the handler.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         event.target properties
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Reading Data from event.target</h2>
+
+            <p class="mb-2"><code>event.target</code> is a full DOM element. Every property available via <code>document.querySelector</code> is also available here.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Common event.target properties:</div>
+                <CodeBlock code={targetDataCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         target vs. currentTarget
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>target vs. currentTarget</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">When they differ:</div>
+                <CodeBlock code={targetVsCurrentCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Key properties syntax
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Property Access Syntax</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Event properties inside a callback:</div>
+                <CodeBlock code={keyPropertiesCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         preventDefault
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>preventDefault</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Stopping default browser behavior:</div>
+                <CodeBlock code={preventDefaultCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Exploratory logging pattern
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>The Log-First Pattern</h2>
+
+            <p class="mb-2">When I encounter an unfamiliar event or element, I log before I extract. This prevents guessing at property names.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Explore before you extract:</div>
+                <CodeBlock code={logPatternCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Back link to Station 2 -->
+    <section class="content-section">
+        <p><a href="/stations/station2/">&larr; Back to Station 2: What Just Happened?</a></p>
+    </section>
+
+</MainLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

@@ -1,0 +1,198 @@
+---
+/**
+ * Cheat Sheet: The addEventListener Pattern
+ * Companion reference for Station 1
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const syntaxCode = `// The addEventListener pattern
+target.addEventListener(eventType, callback);
+
+// Example with all three parts labeled:
+const button = document.querySelector('.my-button');
+//    ^^^^^^ — target (the DOM element)
+
+button.addEventListener('click', handleClick);
+//                       ^^^^^^  ^^^^^^^^^^^
+//                       event   callback
+//                       type    (function reference)`;
+
+const callbackStylesCode = `// Style 1: Named function (recommended for reuse)
+function handleClick(event) {
+  console.log('Clicked!', event.target);
+}
+button.addEventListener('click', handleClick);
+
+// Style 2: Anonymous function (inline, one-time use)
+button.addEventListener('click', function(event) {
+  console.log('Clicked!', event.target);
+});
+
+// Style 3: Arrow function (concise, one-time use)
+button.addEventListener('click', (event) => {
+  console.log('Clicked!', event.target);
+});`;
+
+const commonMistakesCode = `// MISTAKE: Calling the function instead of passing it
+button.addEventListener('click', handleClick());
+//                                          ^^
+// Runs immediately, passes return value (undefined)
+
+// CORRECT: Pass the function reference
+button.addEventListener('click', handleClick);
+
+// MISTAKE: Forgetting quotes on event type
+button.addEventListener(click, handleClick);
+//                      ^^^^^ — not a string!
+
+// CORRECT: Event type is always a string
+button.addEventListener('click', handleClick);`;
+---
+
+<MainLayout
+    title="The addEventListener Pattern | HAP's Learning Lab"
+    description="Quick reference for addEventListener syntax, callback patterns, common event types, and mistakes to avoid."
+    headerTitle="The addEventListener Pattern"
+    headerSubtitle="Quick Reference"
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1759497938/HAP-learner_dvehmt.jpg"
+    avatarAlt="HAP studying and taking notes"
+    introContent="<p>Everything I learned about addEventListener at Station 1, organized for quick reference. The three-part pattern, callback styles, event types, and the mistakes that tripped me up. 🟠</p>"
+    showNavigation={false}
+    footerReminder="addEventListener is the wiring. The callback is the bell."
+>
+
+    <!-- Back link to Station 1 -->
+    <section class="content-section">
+        <p><a href="/stations/station1/">&larr; Back to Station 1: Listening</a></p>
+    </section>
+
+    <!-- ============================================================
+         The Three-Part Pattern
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">The Three-Part Pattern</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>Target</h3>
+                    <p>The DOM element you want to watch. Get it with <code>document.querySelector()</code>. This is the doorbell button.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>Event Type</h3>
+                    <p>A string telling the browser what to listen for: <code>'click'</code>, <code>'submit'</code>, <code>'keydown'</code>. Always in quotes. This is what kind of press activates the bell.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>Callback</h3>
+                    <p>The function that runs when the event fires. Passed by reference (no parentheses). The browser stores it and invokes it later. This is the bell.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Syntax
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Syntax</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">The pattern:</div>
+                <CodeBlock code={syntaxCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Callback Styles
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Callback Styles</h2>
+
+            <p class="mb-2">Three ways to write the callback. All do the same thing &mdash; choose based on whether you need to reuse the function.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Three callback styles:</div>
+                <CodeBlock code={callbackStylesCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Common Event Types
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">Common Event Types</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">🖱️</div>
+                <div>
+                    <h3>Mouse Events</h3>
+                    <p><code>'click'</code> — mouse click or tap. <code>'dblclick'</code> — double click. <code>'mouseover'</code> / <code>'mouseout'</code> — hover enter/leave.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">⌨️</div>
+                <div>
+                    <h3>Keyboard Events</h3>
+                    <p><code>'keydown'</code> — key pressed. <code>'keyup'</code> — key released. Use <code>event.key</code> to check which key (covered in Station 2).</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">📝</div>
+                <div>
+                    <h3>Form Events</h3>
+                    <p><code>'submit'</code> — form submitted (listen on the form element, not the button). <code>'change'</code> — dropdown or checkbox changed. <code>'input'</code> — text typed in a field.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">🔄</div>
+                <div>
+                    <h3>Focus Events</h3>
+                    <p><code>'focus'</code> — element receives focus. <code>'blur'</code> — element loses focus. Useful for form validation as a user moves between fields.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Common Mistakes
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Common Mistakes</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Mistakes I made (so you do not have to):</div>
+                <CodeBlock code={commonMistakesCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Back link to Station 1 -->
+    <section class="content-section">
+        <p><a href="/stations/station1/">&larr; Back to Station 1: Listening</a></p>
+    </section>
+
+</MainLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

@@ -1,0 +1,369 @@
+---
+/**
+ * Station 5: Putting It Together
+ * Primary concept: Combining all event patterns into a mini SPA that mirrors
+ * what students build in their assignment.
+ *
+ * Code role: Reinforcement — full working example combining all patterns from Stations 1-4
+ * Characters: HAP only (no mentor needed — HAP demonstrates confidence)
+ */
+
+import StationLayout from '../../layouts/StationLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const introContent = `
+    <p><strong>Welcome to Station 5!</strong> I have everything I need now. I know how to wire up listeners, read the event object, switch views, handle forms, and delegate events to a parent container. Separately, each pattern is useful. Together, they build something real.</p>
+    <p class="mt-1">I am going to assemble all four patterns into one mini app: a robot card list that you can click to see details, a back button that returns to the list, a notes form that saves without reloading, and dynamically added cards that work with delegation from the moment they appear.</p>
+    <p class="mt-1">This is the same shape as the project coming up in the assignment. I built this version to make sure all the pieces fit together before I needed them to.</p>
+    <p class="mt-1">Let me show you how I put it all together... 🟠</p>
+`;
+
+// Section 2: Card list with delegation (Station 4 pattern)
+const cardListDelegationCode = `// The card container handles clicks on all cards — current and future.
+const cardContainer = document.querySelector('.card-container');
+const detailView = document.querySelector('.detail-view');
+const listView = document.querySelector('.list-view');
+
+cardContainer.addEventListener('click', function(event) {
+  const card = event.target.closest('.robot-card');
+  if (!card) return;
+
+  // Read data from the card element
+  const robotId = card.dataset.robotId;
+  const robotName = card.querySelector('.robot-name').textContent;
+  const robotStatus = card.querySelector('.robot-status').textContent;
+
+  // Populate the detail view
+  document.querySelector('.detail-name').textContent = robotName;
+  document.querySelector('.detail-status').textContent = robotStatus;
+  document.querySelector('.detail-id').textContent = robotId;
+
+  // Switch views (Station 3 pattern)
+  listView.classList.add('hidden');
+  detailView.classList.remove('hidden');
+});`;
+
+// Section 3: Back button and view switching (Station 3 pattern)
+const viewSwitchingCode = `// The back button reverses the view switch
+const backButton = document.querySelector('.back-button');
+
+backButton.addEventListener('click', function(event) {
+  detailView.classList.add('hidden');
+  listView.classList.remove('hidden');
+});
+
+// CSS handles visibility — JS only toggles the class
+// .hidden { display: none; }
+//
+// Two views exist in the HTML at all times.
+// The 'hidden' class controls which one is visible.`;
+
+// Section 4: Notes form with preventDefault (Station 3 pattern)
+const notesFormCode = `// The notes form saves without a page reload
+const notesForm = document.querySelector('.notes-form');
+const notesList = document.querySelector('.notes-list');
+
+notesForm.addEventListener('submit', function(event) {
+  event.preventDefault(); // Stop the page from reloading
+
+  const noteInput = notesForm.querySelector('.note-input');
+  const noteText = noteInput.value.trim();
+
+  if (!noteText) return; // Ignore empty submissions
+
+  // Build a new list item and add it to the notes list
+  const li = document.createElement('li');
+  li.textContent = noteText;
+  notesList.appendChild(li);
+
+  // Clear the input
+  noteInput.value = '';
+  noteInput.focus();
+});`;
+
+// Section 5: Dynamically added cards that work with delegation (Station 4 payoff)
+const dynamicCardsCode = `// Adding a new robot card — works with delegation automatically
+const addCardForm = document.querySelector('.add-card-form');
+
+addCardForm.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const nameInput = addCardForm.querySelector('.new-robot-name');
+  const name = nameInput.value.trim();
+  if (!name) return;
+
+  // Build the card with the same structure delegation expects
+  const card = document.createElement('div');
+  card.classList.add('robot-card');
+  card.dataset.robotId = 'unit-' + Date.now();
+
+  const nameSpan = document.createElement('span');
+  nameSpan.classList.add('robot-name');
+  nameSpan.textContent = name;
+
+  const statusSpan = document.createElement('span');
+  statusSpan.classList.add('robot-status');
+  statusSpan.textContent = 'Online';
+
+  card.appendChild(nameSpan);
+  card.appendChild(statusSpan);
+
+  // Append to the container — the existing delegated listener
+  // on cardContainer catches clicks on this new card immediately.
+  cardContainer.appendChild(card);
+
+  nameInput.value = '';
+});`;
+
+// Section: Full initialization — order matters
+const initOrderCode = `// Initialization order matters — wire events after the DOM is ready
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Get references to elements
+  const cardContainer = document.querySelector('.card-container');
+  const listView = document.querySelector('.list-view');
+  const detailView = document.querySelector('.detail-view');
+  const backButton = document.querySelector('.back-button');
+  const notesForm = document.querySelector('.notes-form');
+  const notesList = document.querySelector('.notes-list');
+  const addCardForm = document.querySelector('.add-card-form');
+
+  // Wire delegation on the card container
+  cardContainer.addEventListener('click', handleCardClick);
+
+  // Wire back button
+  backButton.addEventListener('click', handleBack);
+
+  // Wire notes form
+  notesForm.addEventListener('submit', handleNoteSubmit);
+
+  // Wire add card form
+  addCardForm.addEventListener('submit', handleAddCard);
+
+  // All handler functions are defined below...
+});
+
+// My mistake: I once called the script before DOMContentLoaded
+// and querySelector returned null. Every addEventListener call
+// threw "Cannot read properties of null". Wrapping everything
+// in DOMContentLoaded fixed it.`;
+---
+
+<StationLayout
+    stationNumber={5}
+    title="Putting It Together"
+    subtitle="Building a mini SPA with all event patterns"
+    description="HAP assembles all four event patterns — addEventListener, event object, view switching, forms, and delegation — into one working mini SPA."
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1762699548/hap-celebrating_bljvgl.jpg"
+    avatarAlt="HAP celebrating with arms raised, having assembled a complete working app"
+    introContent={introContent}
+    ogImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_1200,c_fill,g_auto/v1762699548/hap-celebrating_bljvgl.jpg"
+    footerReminder="Four patterns. One app. Events are how a page listens to the world and responds."
+    labName="The Living Page"
+    cheatSheetUrl="/cheat-sheets/events-quick-reference/"
+    cheatSheetTitle="Events Quick Reference"
+>
+
+    <!-- ============================================================
+         SECTION 1: What You'll Learn
+         ============================================================ -->
+    <section class="content-section">
+        <h2 class="section-heading-centered">What You'll Learn at This Station</h2>
+
+        <div class="intro-box">
+            <p><strong>HAP's Discovery:</strong> Each pattern from Stations 1 through 4 is useful on its own. But real apps need all of them working together. At this station, I built a complete mini robot card app &mdash; card list, detail view, back navigation, a notes form, and dynamic card creation. The goal was not to learn anything new but to prove to myself that everything I already knew fit together cleanly.</p>
+        </div>
+
+        <!-- 3 Insight cards -->
+        <div class="overview-grid mt-2">
+            <div class="insight-card">
+                <h3><span class="insight-icon">🏗️</span> Initialization Order</h3>
+                <p class="stat-large">DOMContentLoaded</p>
+                <p>Every event listener must be wired after its target element exists in the DOM. Wrapping setup code in <code>DOMContentLoaded</code> ensures the HTML is parsed before any <code>querySelector</code> runs.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">🔗</span> Patterns Compose</h3>
+                <p class="stat-large stat-teal">4 patterns, 1 app</p>
+                <p>Delegation handles the card list. View switching handles navigation. <code>preventDefault</code> handles both forms. Each piece uses the same <code>addEventListener</code> foundation from Station 1.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">📐</span> Consistent Structure</h3>
+                <p class="stat-large stat-brown">Predictable HTML</p>
+                <p>Delegation only works if dynamically created cards have the same structure as static ones. I learned to build new elements with the same classes and data attributes that the listeners expect.</p>
+            </div>
+        </div>
+
+        <!-- HAP's Confession -->
+        <div class="hap-note-callout">
+            <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1763230414/hap-broke-things_qtbum4.jpg"
+                alt="HAP surrounded by tangled code with an oops expression"
+                width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+            <div class="hap-note-content">
+                <h3>HAP's Confession:</h3>
+                <ul>
+                    <li>I wired all my event listeners before <code>DOMContentLoaded</code>. Every <code>querySelector</code> returned <code>null</code>. Every <code>addEventListener</code> call threw an error. The fix was moving setup code inside a <code>DOMContentLoaded</code> handler, but it took me twenty minutes of staring at the errors to figure that out.</li>
+                    <li>I passed my handler functions with parentheses by accident &mdash; <code>addEventListener('click', handleCardClick())</code>. The function ran immediately on page load instead of on click. The detail view opened the moment the page finished loading, which was very confusing until I remembered the parentheses rule from Station 1.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2: Card List with Delegation
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Card List with Delegation</h2>
+
+            <p class="mb-2">The card container gets one delegated listener. When any card is clicked, the listener uses <code>.closest()</code> to identify which card was clicked, reads its data, and populates the detail view. This is the Station 4 pattern in context.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Card delegation with detail population:</div>
+                <CodeBlock code={cardListDelegationCode} lang="javascript" />
+                <p class="code-comment mt-1">The <code>dataset.robotId</code> attribute on each card gives me a way to identify which card was clicked without parsing text content. I set this attribute when building each card element.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3: View Switching and Back Button
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>View Switching and Back Button</h2>
+
+            <p class="mb-2">Two views live in the HTML simultaneously. The card list delegates clicks to show the detail view. The back button reverses the switch. This is the Station 3 pattern &mdash; the same one I built when I first learned <code>classList</code> toggling.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Back button and view switching:</div>
+                <CodeBlock code={viewSwitchingCode} lang="javascript" />
+                <p class="code-comment mt-1">The <code>hidden</code> class does the work in CSS. JavaScript only decides which element has it. Keeping the display logic in CSS and the state logic in JS made both easier to debug.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 4: Notes Form with preventDefault
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Notes Form with preventDefault</h2>
+
+            <p class="mb-2">The detail view has a notes form. Submitting it adds a note to a list below the form without any page reload. This is the Station 3 form pattern, now nested inside a view that is itself managed by a delegated listener.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Notes form with preventDefault:</div>
+                <CodeBlock code={notesFormCode} lang="javascript" />
+                <p class="code-comment mt-1">After appending the new list item, I clear the input and call <code>.focus()</code> so the user can type another note without clicking back into the field. A small detail that makes the form feel finished.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 5: Dynamically Added Cards
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Dynamically Added Cards That Work with Delegation</h2>
+
+            <p class="mb-2">The real payoff of the delegation pattern: I can add new cards at any time and they immediately respond to clicks. The container's listener was wired once and covers everything inside it &mdash; now and in the future.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Adding a new card dynamically:</div>
+                <CodeBlock code={dynamicCardsCode} lang="javascript" />
+                <p class="code-comment mt-1">The key is building the new card with exactly the same structure the delegation handler expects &mdash; the <code>.robot-name</code> and <code>.robot-status</code> spans, and the <code>data-robot-id</code> attribute. If the structure matches, the listener works with no extra code.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 6: Initialization — Putting It All Together
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Initialization — Putting It All Together</h2>
+
+            <p class="mb-2">When all four patterns live in one file, initialization order becomes important. I learned to collect all my <code>querySelector</code> calls and <code>addEventListener</code> calls in one <code>DOMContentLoaded</code> handler so I know exactly when they run.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Full initialization pattern:</div>
+                <CodeBlock code={initOrderCode} lang="javascript" />
+                <p class="code-comment mt-1">Naming all handlers as separate functions instead of writing anonymous functions inline makes this initialization block easy to scan. The <code>DOMContentLoaded</code> block reads like a table of contents &mdash; I can see at a glance what the app responds to.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION: Quick Reference
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">Mini SPA Assembly Quick Reference</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>Wire Events After DOMContentLoaded</h3>
+                    <p>Wrap all <code>querySelector</code> calls and <code>addEventListener</code> calls in a <code>DOMContentLoaded</code> handler. If the element does not exist yet, <code>querySelector</code> returns <code>null</code> and every listener call throws an error.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>Pass Functions, Not Calls</h3>
+                    <p><code>addEventListener('click', handleCardClick)</code> &mdash; no parentheses. Adding <code>()</code> calls the function immediately on page load. This mistake is subtle because no error is thrown &mdash; the handler fires once and never again.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>Keep Dynamically Created Elements Consistent</h3>
+                    <p>When building elements with <code>createElement</code>, give them the same classes and data attributes that existing listeners expect. Delegation has no way to handle a card that is structured differently from the rest.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>One Pattern at a Time</h3>
+                    <p>When something breaks in a multi-pattern app, I isolate which pattern is misbehaving. Is the event firing at all? Is the wrong element being targeted? Is the view toggle not running? Each pattern has its own failure mode.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Capstone callout
+         ============================================================ -->
+    <section class="content-section">
+        <div class="hap-note-callout">
+            <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1763230522/hap-thumbs-up_s4si0j.jpg"
+                alt="HAP giving a thumbs up, confident after completing the mini app"
+                width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+            <div class="hap-note-content">
+                <h3>HAP's Victory:</h3>
+                <p>I have a working interactive app &mdash; four patterns, one file, no frameworks. Every click is handled. Every form submits cleanly. New cards appear and work immediately. The page is alive. 🟠</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Transition to Station 6
+         ============================================================ -->
+    <section class="content-section">
+        <div class="hap-note-callout">
+            <div class="hap-note-content">
+                <p>I built this mini app myself. But what happens when I ask an AI to help me build more? At Station 6, I find out what AI-generated event code looks like &mdash; and why knowing these patterns makes me much better at reading and trusting what it produces.</p>
+            </div>
+        </div>
+    </section>
+
+</StationLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

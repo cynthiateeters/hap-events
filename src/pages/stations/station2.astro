@@ -1,0 +1,263 @@
+---
+/**
+ * Station 2: What Just Happened?
+ * Primary concept: The event object — the browser's report of what happened,
+ * where, and to what.
+ *
+ * Code role: Diagnostic
+ * Characters: HAP, Grace Hopper (no Prof. Teeters)
+ */
+
+import StationLayout from '../../layouts/StationLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const introContent = `
+    <p><strong>Welcome to Station 2!</strong> After I got my first click listener working, I noticed the callback was receiving something &mdash; a parameter called <code>event</code>. I had been ignoring it completely.</p>
+    <p class="mt-1">So I did what I do when I want to understand something: I logged it. I typed <code>console.log(event)</code> inside my callback and clicked the badge.</p>
+    <p class="mt-1">The console exploded. There were dozens of properties &mdash; coordinates, timestamps, flags I had never heard of. I closed the console and stared at the ceiling for a while.</p>
+    <p class="mt-1">Then I started pulling out individual properties. That's when I found <code>event.target</code> &mdash; the exact element that was clicked &mdash; and everything started making sense.</p>
+    <p class="mt-1">Let me show you what the browser is actually sending you... 🟠</p>
+`;
+
+const logEventCode = `// The simplest diagnostic: log the whole event object
+const statusBadge = document.querySelector('.status-badge');
+
+statusBadge.addEventListener('click', function(event) {
+  console.log(event);
+  // PointerEvent {
+  //   type: "click",
+  //   target: button.status-badge,
+  //   clientX: 142, clientY: 87,
+  //   timeStamp: 1847.3,
+  //   ... (dozens more properties)
+  // }
+});`;
+
+const targetTypeCode = `// event.target — the element that was clicked
+// event.type  — what kind of event it was
+
+statusBadge.addEventListener('click', function(event) {
+  console.log(event.target);  // <button class="status-badge">Active</button>
+  console.log(event.type);    // "click"
+
+  // Now we can use the target to make smart decisions:
+  console.log(event.target.textContent);  // "Active"
+  console.log(event.target.className);    // "status-badge"
+});`;
+
+const targetVsCurrentTargetCode = `// Difference between target and currentTarget:
+const cardContainer = document.querySelector('.card-container');
+
+cardContainer.addEventListener('click', function(event) {
+  console.log(event.target);        // The element actually clicked
+                                    // (could be a <span> inside the card)
+  console.log(event.currentTarget); // cardContainer — always the element
+                                    // the listener is attached to
+});
+
+// When you click a <span> inside .card-container:
+// event.target        → <span>the span you clicked</span>
+// event.currentTarget → <div class="card-container">...</div>`;
+
+const preventDefaultCode = `// event.preventDefault() — stop the browser's default behavior
+const link = document.querySelector('a.internal-nav');
+
+link.addEventListener('click', function(event) {
+  event.preventDefault(); // Don't follow the href
+  console.log('Link clicked, but page did not navigate');
+  // Now handle navigation yourself
+});`;
+---
+
+<StationLayout
+    stationNumber={2}
+    title="What Just Happened?"
+    subtitle="The event object"
+    description="HAP discovers the event object — the browser's report of every click. Learn event.target, event.type, and the difference between target and currentTarget."
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1763230817/hap-scientist_safwtg.jpg"
+    avatarAlt="HAP in scientist mode, examining the event object with curiosity"
+    introContent={introContent}
+    ogImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_1200,c_fill,g_auto/v1763230817/hap-scientist_safwtg.jpg"
+    nextStationTitle="Swapping Views"
+    footerReminder="event.target is which element. event.type is what happened. Those two properties answer most questions."
+    labName="The Living Page"
+    cheatSheetUrl="/cheat-sheets/event-object/"
+    cheatSheetTitle="The Event Object"
+>
+
+    <!-- ============================================================
+         SECTION 1: What You'll Learn
+         ============================================================ -->
+    <section class="content-section">
+        <h2 class="section-heading-centered">What You'll Learn at This Station</h2>
+
+        <div class="intro-box">
+            <p><strong>HAP's Discovery:</strong> Every time an event fires, the browser assembles a detailed report and passes it to my callback. I had been receiving this report for a whole station without opening it. Once I learned to read <code>event.target</code> and <code>event.type</code>, I could write one handler that works intelligently for many elements instead of writing a separate function for each one.</p>
+        </div>
+
+        <div class="overview-grid mt-2">
+            <div class="insight-card">
+                <h3><span class="insight-icon">📋</span> The Event Object</h3>
+                <p class="stat-large">console.log(event)</p>
+                <p>The browser's report of exactly what happened, where, and to what. The callback receives it automatically — you do not request it.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">🎯</span> event.target</h3>
+                <p class="stat-large stat-teal">which element</p>
+                <p>The specific element the user interacted with. This is the key to writing handlers that respond differently based on what was clicked.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">🏷️</span> event.type</h3>
+                <p class="stat-large stat-brown">"click", "submit"...</p>
+                <p>What kind of event occurred. Useful when one handler is registered for multiple event types and needs to branch on what triggered it.</p>
+            </div>
+        </div>
+
+        <!-- HAP's Confession -->
+        <div class="hap-note-callout">
+            <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1763230414/hap-broke-things_qtbum4.jpg"
+                alt="HAP surrounded by tangled code with an oops expression"
+                width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+            <div class="hap-note-content">
+                <h3>HAP's Confession:</h3>
+                <ul>
+                    <li>I tried to use <code>event.target</code> outside the callback &mdash; assigned it to a variable at the top of the script. Got <code>undefined</code> every time. The event object only exists inside the callback, while the event is being handled.</li>
+                    <li>I logged <code>event.target</code> expecting to see just a name or ID. What came back was the entire HTML element: <code>&lt;button class="status-badge"&gt;Active&lt;/button&gt;</code>. I did not realize I had to go one step further &mdash; <code>event.target.textContent</code> or <code>event.target.id</code> &mdash; to get specific data.</li>
+                    <li>I assumed <code>event.target</code> and <code>event.currentTarget</code> were the same thing. Grace Hopper corrected me on this, and I am glad she did because the difference matters a lot later.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2: Reading the Event Object
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Reading the Event Object</h2>
+
+            <p class="mb-2">When a click fires, the browser creates an event object and passes it to my callback as the first argument. The parameter name does not matter &mdash; I could call it <code>e</code> or <code>evt</code> &mdash; but I use <code>event</code> because it is unambiguous. The first thing I did was log the whole object to see what was there.</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Logging the full event object:</div>
+                <CodeBlock code={logEventCode} lang="javascript" />
+                <p class="code-comment mt-1">The browser returns a <code>PointerEvent</code> (for clicks) with dozens of properties. Most are not relevant to everyday work. The ones I reach for first are <code>type</code> and <code>target</code>.</p>
+            </div>
+
+            <div class="analysis-grid mt-2">
+                <div class="analysis-point">
+                    <h3>event.target</h3>
+                    <p>The DOM element the user actually interacted with. For a click, it is the element they clicked. This is the most useful property in everyday event handling.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>event.type</h3>
+                    <p>A string naming the kind of event: <code>"click"</code>, <code>"submit"</code>, <code>"keydown"</code>. Useful when one callback handles multiple event types.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>event.timeStamp</h3>
+                    <p>Milliseconds since the page loaded when the event fired. More useful for performance measurement than for everyday handlers.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>event.preventDefault()</h3>
+                    <p>A method (not a property) that stops the browser's built-in behavior for this event type. More on this at Station 3.</p>
+                </div>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">Using event.target and event.type:</div>
+                <CodeBlock code={targetTypeCode} lang="javascript" />
+                <p class="code-comment mt-1"><code>event.target</code> is a live DOM element &mdash; all the usual DOM properties (<code>textContent</code>, <code>id</code>, <code>className</code>, <code>dataset</code>) are available on it.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3: target vs. currentTarget
+         Grace Hopper explains
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>target vs. currentTarget</h2>
+
+            <p class="mb-2">I had been using <code>event.target</code> as if it were the only option. Then I noticed <code>event.currentTarget</code> in the console and assumed they were the same. Grace Hopper explained why they are not.</p>
+
+            <!-- Grace Hopper callout -->
+            <div class="hap-note-callout hap-note-callout--grace mt-2">
+                <div class="hap-note-content">
+                    <h3>Grace Hopper:</h3>
+                    <p>"They are not the same. <code>event.target</code> is the element that was clicked. <code>event.currentTarget</code> is the element the listener is attached to. When they differ, you are witnessing event propagation."</p>
+                </div>
+            </div>
+
+            <p class="mt-2">That last line &mdash; "when they differ, you are witnessing event propagation" &mdash; meant nothing to me at the time. It will mean something at Station 4. For now, the distinction to hold onto is: <code>target</code> is where the event started, <code>currentTarget</code> is where the listener lives.</p>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">target vs. currentTarget in practice:</div>
+                <CodeBlock code={targetVsCurrentTargetCode} lang="javascript" />
+                <p class="code-comment mt-1">If a listener is on a container and the user clicks a child element inside it, <code>event.target</code> is the child and <code>event.currentTarget</code> is the container. This difference is the foundation of event delegation (Station 4).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION: Quick Reference
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">Event Object Quick Reference</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>The Browser Passes It Automatically</h3>
+                    <p>The event object arrives as the first argument to every callback. Name it <code>event</code> for clarity. It only exists inside the callback &mdash; do not try to store it or use it outside.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>event.target Is the Clicked Element</h3>
+                    <p>A live DOM element. Use <code>event.target.textContent</code>, <code>event.target.id</code>, or <code>event.target.dataset</code> to pull out specific data. Logging <code>event.target</code> alone returns the whole element.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>target ≠ currentTarget</h3>
+                    <p><code>event.target</code> is where the event originated. <code>event.currentTarget</code> is where the listener is attached. They are the same only when the user clicks directly on the element the listener is on.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>Log First, Then Extract</h3>
+                    <p>When exploring an unfamiliar event, log the whole object first: <code>console.log(event)</code>. Once I see what's there, I pull out specific properties. Guessing property names wastes time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Transition to Station 3
+         ============================================================ -->
+    <section class="content-section">
+        <div class="hap-note-callout">
+            <div class="hap-note-content">
+                <p>I understand what the browser tells me now. But how do I use this to change what the user sees? Clicking a robot card should show its detail view &mdash; and there should be a way back. That means managing which parts of the page are visible. 🟠</p>
+            </div>
+        </div>
+    </section>
+
+</StationLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

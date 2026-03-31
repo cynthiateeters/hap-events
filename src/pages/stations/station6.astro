@@ -1,0 +1,475 @@
+---
+/**
+ * Station 6: AI and Your Event-Driven Code
+ * CUSTOM STRUCTURE — not based on station-template.
+ *
+ * Primary concept: AI tools don't understand your app's architecture
+ * unless you tell them. Defense in depth catches what you miss.
+ *
+ * Characters: HAP, Grace Hopper
+ * Code role: Comparative — four versions of renderAbout()
+ */
+
+import StationLayout from '../../layouts/StationLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const introContent = `
+    <p><strong>Welcome to Station 6!</strong> After Station 5, I had a fully working interactive robot card app. Delegation, view switching, forms &mdash; the page was alive.</p>
+    <p class="mt-1">So I asked the AI for help building more. I wanted an "About" section. What I got back taught me more than any of the previous stations.</p>
+    <p class="mt-1">The AI does not know my app's architecture. It does not know I built a single-page app. It does not know about my AGENTS.md rules. And even when I caught some mistakes, there was one I missed completely.</p>
+    <p class="mt-1">Let me show you the three layers of problems I found &mdash; and the four-layer defense system that protects me even when I cannot catch everything myself... 🟠</p>
+`;
+
+const wrongArchitectureCode = `// What the AI generated:
+function addAboutSection() {
+  const aboutLink = document.createElement('a');
+  aboutLink.href = 'about.html';
+  aboutLink.textContent = 'About';
+  nav.appendChild(aboutLink);
+}
+
+// The problem: I don't HAVE an about.html.
+// My whole app is one page. The AI assumed
+// a traditional multi-page site.`;
+
+const fixedArchitectureCode = `// What I told the AI to do instead:
+// "Make a renderAbout() view function —
+//  my app is a single page, not multi-page."
+
+function renderAbout() {
+  // Show the about view, hide others
+  // (like the view-switching pattern from Station 3)
+}`;
+
+const innerHTMLCode = `// The AI's renderAbout() — version 2:
+function renderAbout() {
+  const container = document.querySelector('.main-content');
+  container.innerHTML = \`
+    <div class="about-section">
+      <h2>About Robot Cards</h2>
+      <p>This app lets you manage your robot collection.</p>
+      <button class="back-btn">Back to Cards</button>
+    </div>
+  \`;
+}
+
+// It works. But innerHTML with a template literal
+// is the exact pattern Grace warned about in the DOM lab.
+// My AGENTS.md says: "Never use innerHTML."
+// I caught this one.`;
+
+const onclickCode = `// The AI's renderAbout() — version 3 (createElement):
+function renderAbout() {
+  const container = document.querySelector('.main-content');
+  container.textContent = '';
+
+  const section = document.createElement('div');
+  section.classList.add('about-section');
+
+  const heading = document.createElement('h2');
+  heading.textContent = 'About Robot Cards';
+
+  const description = document.createElement('p');
+  description.textContent = 'This app lets you manage your robot collection.';
+
+  const backBtn = document.createElement('button');
+  backBtn.classList.add('back-btn');
+  backBtn.textContent = 'Back to Cards';
+
+  // The subtle issue:
+  backBtn.onclick = () => renderHome();
+  //      ^^^^^^^
+  // onclick property assignment, not addEventListener
+
+  section.append(heading, description, backBtn);
+  container.appendChild(section);
+}`;
+
+const correctCode = `// The correct version — addEventListener:
+function renderAbout() {
+  const container = document.querySelector('.main-content');
+  container.textContent = '';
+
+  const section = document.createElement('div');
+  section.classList.add('about-section');
+
+  const heading = document.createElement('h2');
+  heading.textContent = 'About Robot Cards';
+
+  const description = document.createElement('p');
+  description.textContent = 'This app lets you manage your robot collection.';
+
+  const backBtn = document.createElement('button');
+  backBtn.classList.add('back-btn');
+  backBtn.textContent = 'Back to Cards';
+
+  // addEventListener — permits multiple handlers
+  backBtn.addEventListener('click', () => renderHome());
+
+  section.append(heading, description, backBtn);
+  container.appendChild(section);
+}`;
+
+const agentsMdCode = `# AGENTS.md additions for event-driven code
+
+## Architecture
+- This is a single-page app (SPA).
+- Never generate code that creates new HTML files
+  or uses window.location for navigation.
+- All "pages" are view functions that show/hide
+  content within index.html.
+
+## Code rules
+- Use addEventListener, not onclick property assignments.
+- Never use innerHTML — use createElement and textContent.
+- All event listeners use named callbacks or arrow functions
+  passed to addEventListener.`;
+
+const eslintConfigCode = `// ESLint plugins for event-driven code safety
+
+// eslint-plugin-unicorn
+// Rule: prefer-add-event-listener
+// Flags: btn.onclick = () => { ... }
+// Suggests: btn.addEventListener('click', () => { ... })
+
+// eslint-plugin-no-unsanitized (Mozilla)
+// Rule: no-unsanitized/property
+// Flags: element.innerHTML = userInput
+// Flags: element.outerHTML = template`;
+---
+
+<StationLayout
+    stationNumber={6}
+    title="AI and Your Event-Driven Code"
+    subtitle="When AI doesn't know your architecture"
+    description="HAP discovers AI tools don't understand app architecture. Learn the three-layer problem and a four-layer defense: AGENTS.md, ESLint, Husky, Copilot review."
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1764180952/hap-meets-grace_v2yifo.jpg"
+    avatarAlt="HAP meeting with Grace Hopper to review AI-generated code"
+    introContent={introContent}
+    ogImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_1200,c_fill,g_auto/v1764180952/hap-meets-grace_v2yifo.jpg"
+    footerReminder="AGENTS.md is prevention. ESLint is detection. Husky is enforcement. Copilot review is your second pair of eyes."
+    labName="The Living Page"
+    cheatSheetUrl="/cheat-sheets/defense-in-depth-playbook/"
+    cheatSheetTitle="Your Defense-in-Depth Playbook"
+>
+
+    <!-- ============================================================
+         SECTION 1: What You'll Learn
+         ============================================================ -->
+    <section class="content-section">
+        <h2 class="section-heading-centered">What You'll Learn at This Station</h2>
+
+        <div class="intro-box">
+            <p><strong>HAP's Discovery:</strong> AI code generation is powerful, but AI does not know my app's architecture, my security rules, or the subtle differences between patterns that work and patterns that are technically correct but architecturally wrong. I needed layers of protection that do not depend on me being perfect.</p>
+        </div>
+
+        <div class="overview-grid mt-2">
+            <div class="insight-card">
+                <h3><span class="insight-icon">🏗️</span> Architecture Assumptions</h3>
+                <p class="stat-large">AI guesses wrong</p>
+                <p>AI assumed my single-page app was a multi-page site and generated navigation links to files that do not exist.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">🔍</span> Catching Security Patterns</h3>
+                <p class="stat-large stat-teal">innerHTML vs createElement</p>
+                <p>I caught the innerHTML problem because of AGENTS.md from the DOM lab. But the next issue was subtler.</p>
+            </div>
+
+            <div class="insight-card">
+                <h3><span class="insight-icon">🛡️</span> Defense in Depth</h3>
+                <p class="stat-large stat-brown">4 independent layers</p>
+                <p>AGENTS.md prevents. ESLint detects. Husky enforces. Copilot code review catches what everything else misses.</p>
+            </div>
+        </div>
+
+        <!-- HAP's Confession -->
+        <div class="hap-note-callout">
+            <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1763230464/hap-sconcerned-laptop_frh5ua.jpg"
+                alt="HAP looking concerned at laptop screen showing AI-generated code"
+                width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+            <div class="hap-note-content">
+                <h3>HAP's Confession:</h3>
+                <ul>
+                    <li>I asked the AI for an about page and got <code>href="about.html"</code>. The AI assumed my app was multi-page.</li>
+                    <li>I caught the innerHTML on the second try &mdash; only because my AGENTS.md reminded me.</li>
+                    <li>I missed the onclick property assignment completely. Grace caught it. I did not even know there was a difference.</li>
+                    <li>I realized AGENTS.md only works if the AI reads and follows it. ESLint and Husky do not depend on AI cooperation.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2: The Three-Layer Scene Introduction
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>The Three-Layer Scene</h2>
+
+            <p class="mb-2">After building my mini SPA at Station 5, I was feeling confident. I asked the AI: "Help me add an About section to my robot card app." What followed was a lesson in three layers of problems I did not expect.</p>
+
+            <div class="hap-note-callout mt-2">
+                <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1759495998/hap-laptop_xiewar.jpg"
+                    alt="HAP working at laptop, asking AI for help"
+                    width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+                <div class="hap-note-content">
+                    <h3>HAP's Request to the AI:</h3>
+                    <p>"I have a robot card app. I want to add an About section. Can you write the code?"</p>
+                    <p class="mt-1">Sounds simple. But what the AI generated revealed three layers of assumptions I had to catch &mdash; and one I could not.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3: Layer 1 — Wrong Architecture
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Layer 1: AI Does Not Know My Architecture</h2>
+
+            <p class="mb-2">The AI's first attempt created a link to <code>about.html</code>. But I do not have an about.html. My whole app is a single page with view functions.</p>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">What the AI generated:</div>
+                <CodeBlock code={wrongArchitectureCode} lang="javascript" />
+            </div>
+
+            <p class="mt-2">I caught this one right away. The AI assumed a traditional multi-page site because I did not tell it otherwise. My fix: tell the AI to make a <code>renderAbout()</code> view function instead.</p>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">What I asked for instead:</div>
+                <CodeBlock code={fixedArchitectureCode} lang="javascript" />
+            </div>
+
+            <div class="hap-note-callout mt-2">
+                <div class="hap-note-content">
+                    <h3>🟠 Lesson:</h3>
+                    <p>AI does not know my app is a single-page app unless I tell it. The AI has no context about my project's architecture &mdash; it generates code based on the most common patterns it has seen, and multi-page is more common.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 4: Layer 2 — innerHTML
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Layer 2: AI Reaches for innerHTML</h2>
+
+            <p class="mb-2">The AI listened. It wrote a <code>renderAbout()</code> view function. But it used <code>innerHTML</code> with a template literal to build the content.</p>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">The AI's second attempt:</div>
+                <CodeBlock code={innerHTMLCode} lang="javascript" />
+            </div>
+
+            <p class="mt-2">This works. The about section renders correctly. But innerHTML with dynamic content is exactly the pattern Grace warned about in the DOM lab. My AGENTS.md already says "Never use innerHTML." I caught this one &mdash; but only because I had that rule written down.</p>
+
+            <div class="hap-note-callout mt-2">
+                <div class="hap-note-content">
+                    <h3>🟠 Lesson:</h3>
+                    <p>AGENTS.md saved me here. Without that written rule, I might have accepted the innerHTML version because it works. The danger is not in code that fails &mdash; it is in code that works but introduces a security risk.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 5: Layer 3 — onclick vs addEventListener
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Layer 3: The Subtle Issue</h2>
+
+            <p class="mb-2">The AI tried again. This time it used createElement &mdash; the safe way I learned in the DOM lab. No innerHTML. I was ready to accept it. Then Grace spoke up.</p>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">The AI's third attempt (createElement, but...):</div>
+                <CodeBlock code={onclickCode} lang="javascript" />
+            </div>
+
+            <!-- Grace catches it -->
+            <div class="hap-note-callout hap-note-callout--grace mt-2">
+                <div class="hap-note-content">
+                    <h3>Grace Hopper:</h3>
+                    <p>"The onclick property works. But it permits only one handler per event. addEventListener permits many. The AI chose convenience. You must decide whether convenience is acceptable for your architecture."</p>
+                </div>
+            </div>
+
+            <p class="mt-2">I stared at the code. <code>backBtn.onclick = () =&gt; renderHome()</code>. It looked fine to me. But Grace was right &mdash; <code>onclick</code> is a property assignment. If anything else sets <code>onclick</code> on that button, it overwrites my handler. <code>addEventListener</code> stacks handlers &mdash; multiple things can listen to the same event.</p>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">The correct version:</div>
+                <CodeBlock code={correctCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 6: HAP's Reflection
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>What I Caught and What I Missed</h2>
+
+            <div class="hap-note-callout">
+                <img src="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_150,c_limit/v1763230464/hap-sconcerned-laptop_frh5ua.jpg"
+                    alt="HAP reflecting on the three layers of AI code problems"
+                    width="150" height="150" class="hap-note-image" decoding="async" loading="lazy">
+                <div class="hap-note-content">
+                    <h3>HAP's Reflection:</h3>
+                    <p>I caught the wrong architecture &mdash; <code>href="about.html"</code> was obvious because I know my app is a single page.</p>
+                    <p class="mt-1">I caught the innerHTML &mdash; but only because AGENTS.md reminded me.</p>
+                    <p class="mt-1">I missed the onclick. Grace caught it. I did not even know there was a difference between <code>onclick</code> and <code>addEventListener</code>.</p>
+                    <p class="mt-1">The more I learn, the more I can see &mdash; but there is always another layer. 🟠</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 7: Defense in Depth
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Defense in Depth</h2>
+
+            <p class="mb-2">If Grace had not been here, how would I catch these problems? That question led me to the answer: I need layers of protection that do not depend on me being perfect.</p>
+
+            <div class="analysis-grid">
+                <div class="analysis-point">
+                    <h3>Layer 1: AGENTS.md &mdash; Prevention</h3>
+                    <p>Tell the AI what to generate and what to avoid. Architecture rules ("this is an SPA, never generate new HTML files") and code rules ("use addEventListener, not onclick"). This is the first line of defense &mdash; but it only works if the AI reads and follows it.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Layer 2: ESLint Plugins &mdash; Detection</h3>
+                    <p><strong>eslint-plugin-unicorn</strong> has a <code>prefer-add-event-listener</code> rule that flags <code>btn.onclick = ...</code>. <strong>eslint-plugin-no-unsanitized</strong> (from Mozilla) flags innerHTML assignments. These scan code after it is written &mdash; they do not depend on the AI cooperating.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Layer 3: Husky + lint-staged &mdash; Enforcement</h3>
+                    <p>Already in ready-build from Week 1. Runs ESLint at commit time. Even if I ignore warnings in the editor, the commit hook blocks bad code from entering the repo. The gate does not open for code that breaks the rules.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Layer 4: Copilot Code Review &mdash; AI Reviewer</h3>
+                    <p>Available via CLI: <code>gh pr edit --add-reviewer @copilot</code>. Analyzes full repo context, not just the diff. It is like having a reviewer who never gets tired and never misses a PR.</p>
+                </div>
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">AGENTS.md additions for event-driven code:</div>
+                <CodeBlock code={agentsMdCode} lang="javascript" />
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">ESLint plugins that catch event-code issues:</div>
+                <CodeBlock code={eslintConfigCode} lang="javascript" />
+            </div>
+
+            <!-- Grace's final line -->
+            <div class="hap-note-callout hap-note-callout--grace mt-2">
+                <div class="hap-note-content">
+                    <h3>Grace Hopper:</h3>
+                    <p>"Defense in depth. You do not rely on a single mechanism. Each layer is independent. Each catches what the others miss."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 8: Code Comparison — Four Versions
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Four Versions of renderAbout()</h2>
+
+            <p class="mb-2">Here are all four versions the AI generated, in order. Each one got closer to correct, but each had a different kind of problem.</p>
+
+            <div class="analysis-grid">
+                <div class="analysis-point">
+                    <h3>Version 1: Wrong Architecture</h3>
+                    <p>Used <code>href="about.html"</code>. Assumed multi-page. I caught it because I know my app is a single page.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Version 2: Security Risk</h3>
+                    <p>Used <code>innerHTML</code> with a template literal. Works, but the DOM lab taught me this is a security risk. AGENTS.md caught it.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Version 3: Subtle Issue</h3>
+                    <p>Used <code>createElement</code> (safe) but <code>onclick</code> property (only one handler allowed). Grace caught it. I missed it completely.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Version 4: Correct</h3>
+                    <p>Uses <code>createElement</code> and <code>addEventListener</code>. Safe, extensible, follows the pattern from Station 1. This is the version that belongs in the app.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION: Quick Reference
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">Defense-in-Depth Quick Reference</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>AGENTS.md &mdash; Prevention</h3>
+                    <p>Add architecture rules ("this is an SPA") and code rules ("use addEventListener, not onclick"). Prevents the AI from generating wrong patterns in the first place.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>ESLint Plugins &mdash; Detection</h3>
+                    <p><code>eslint-plugin-unicorn</code> (prefer-add-event-listener) and <code>eslint-plugin-no-unsanitized</code> (flags innerHTML). Scans code regardless of who wrote it.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>Husky + lint-staged &mdash; Enforcement</h3>
+                    <p>Runs ESLint at commit time. Bad code cannot enter the repo, even if warnings are ignored in the editor.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>Copilot Code Review &mdash; AI Reviewer</h3>
+                    <p><code>gh pr edit --add-reviewer @copilot</code>. Reviews the full repo context on every PR. A second pair of eyes that never has to recharge.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         HAP's Closing Reflection
+         ============================================================ -->
+    <section class="content-section">
+        <div class="hap-note-callout">
+            <div class="hap-note-content">
+                <h3>HAP's Closing Reflection:</h3>
+                <p>From "the page just sits there" to "I can make any element respond to anything, and I have layers of protection that do not depend on me being perfect."</p>
+                <p class="mt-1">AGENTS.md is prevention. ESLint is detection. Husky is enforcement. And Copilot code review? That is like having a Grace who never has to recharge. 🟠</p>
+            </div>
+        </div>
+    </section>
+
+</StationLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

@@ -1,0 +1,231 @@
+---
+/**
+ * Cheat Sheet: Your Defense-in-Depth Playbook
+ * Companion reference for Station 6
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const agentsMdExample = `# AGENTS.md — Event-Driven Code Rules
+
+## Architecture
+- This is a single-page app (SPA).
+- Never generate code that creates new HTML files
+  or uses window.location for navigation.
+- All "pages" are view functions that show/hide
+  content within index.html.
+
+## Code rules
+- Use addEventListener, not onclick property assignments.
+- Never use innerHTML — use createElement and textContent.
+- All event listeners use named callbacks or arrow functions
+  passed to addEventListener.`;
+
+const eslintSetupCode = `# Install the ESLint plugins
+npm install --save-dev eslint-plugin-unicorn
+npm install --save-dev eslint-plugin-no-unsanitized`;
+
+const eslintRulesCode = `// In your ESLint config:
+
+// eslint-plugin-unicorn
+// Rule: prefer-add-event-listener
+// Flags: btn.onclick = () => { ... }
+// Suggests: btn.addEventListener('click', () => { ... })
+
+// eslint-plugin-no-unsanitized (Mozilla)
+// Rule: no-unsanitized/property
+// Flags: element.innerHTML = value
+// Flags: element.outerHTML = value`;
+
+const huskyCode = `# Husky + lint-staged (already in ready-build)
+# Runs ESLint on every commit.
+# If ESLint fails, the commit is blocked.
+
+# To verify it's working:
+git commit -m "test" --dry-run
+# If lint-staged is configured, it will run ESLint
+# on staged files before allowing the commit.`;
+
+const copilotCode = `# Add Copilot as a reviewer on a pull request:
+gh pr edit --add-reviewer @copilot
+
+# Copilot reviews the full repo context, not just the diff.
+# It can catch architectural mismatches, security issues,
+# and patterns that static analysis misses.`;
+---
+
+<MainLayout
+    title="Your Defense-in-Depth Playbook | HAP's Learning Lab"
+    description="Four layers of protection for AI-generated event code: AGENTS.md, ESLint plugins, Husky enforcement, and Copilot code review."
+    headerTitle="Your Defense-in-Depth Playbook"
+    headerSubtitle="Quick Reference"
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1759497938/HAP-learner_dvehmt.jpg"
+    avatarAlt="HAP studying and taking notes"
+    introContent="<p>The four-layer defense system I learned at Station 6. Each layer is independent. Each catches what the others miss. Here is how to set them all up. 🟠</p>"
+    showNavigation={false}
+    footerReminder="Defense in depth. You do not rely on a single mechanism."
+>
+
+    <!-- Back link to Station 6 -->
+    <section class="content-section">
+        <p><a href="/stations/station6/">&larr; Back to Station 6: AI and Your Event-Driven Code</a></p>
+    </section>
+
+    <!-- ============================================================
+         The Four Layers
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">The Four Layers</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>AGENTS.md &mdash; Prevention</h3>
+                    <p>Tells the AI what to generate and what to avoid. Architecture rules and code rules. First line of defense, but only works if the AI reads and follows it.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>ESLint Plugins &mdash; Detection</h3>
+                    <p><strong>eslint-plugin-unicorn:</strong> <code>prefer-add-event-listener</code> flags onclick assignments. <strong>eslint-plugin-no-unsanitized:</strong> flags innerHTML. These scan code regardless of who wrote it.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>Husky + lint-staged &mdash; Enforcement</h3>
+                    <p>Runs ESLint at commit time. Already in ready-build. Even if warnings are ignored in the editor, bad code cannot enter the repo.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>Copilot Code Review &mdash; AI Reviewer</h3>
+                    <p><code>gh pr edit --add-reviewer @copilot</code>. Analyzes full repo context on every PR. Catches architectural mismatches, security issues, and subtle patterns that static analysis misses.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         What Each Layer Catches
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>What Each Layer Catches</h2>
+
+            <div class="analysis-grid">
+                <div class="analysis-point">
+                    <h3>Wrong Architecture</h3>
+                    <p><strong>AGENTS.md</strong> catches this. Tells the AI "this is an SPA" so it does not generate multi-page navigation. <strong>Copilot review</strong> can also catch architectural mismatches in PRs.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>innerHTML Usage</h3>
+                    <p><strong>AGENTS.md</strong> says "never innerHTML." <strong>eslint-plugin-no-unsanitized</strong> flags it automatically. <strong>Husky</strong> blocks the commit if ESLint fails.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>onclick vs addEventListener</h3>
+                    <p><strong>AGENTS.md</strong> says "use addEventListener." <strong>eslint-plugin-unicorn</strong> flags onclick assignments. <strong>Husky</strong> blocks the commit.</p>
+                </div>
+
+                <div class="analysis-point">
+                    <h3>Patterns AI Invents</h3>
+                    <p>AI may generate patterns that are technically valid but architecturally wrong. <strong>Copilot review</strong> catches these because it sees the full repo context, not just one file.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         AGENTS.md Setup
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>AGENTS.md for Event-Driven Code</h2>
+
+            <p class="mb-2">Add these rules to your AGENTS.md to prevent the most common AI mistakes with event code:</p>
+
+            <div class="prompt-box">
+                <div class="prompt-label">AGENTS.md additions:</div>
+                <CodeBlock code={agentsMdExample} lang="bash" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         ESLint Plugins
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>ESLint Plugin Setup</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Install the plugins:</div>
+                <CodeBlock code={eslintSetupCode} lang="bash" />
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">What the rules catch:</div>
+                <CodeBlock code={eslintRulesCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Husky
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Husky + lint-staged</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Already in ready-build:</div>
+                <CodeBlock code={huskyCode} lang="bash" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Copilot Code Review
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Copilot Code Review</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Add Copilot as a reviewer:</div>
+                <CodeBlock code={copilotCode} lang="bash" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         The Key Insight
+         ============================================================ -->
+    <section class="content-section">
+        <div class="hap-note-callout">
+            <div class="hap-note-content">
+                <h3>The Key Insight:</h3>
+                <p>AGENTS.md tells the AI what to do. ESLint checks after the code is written. Husky blocks bad code at commit time. Copilot reviews the full picture on every PR. No single layer catches everything &mdash; but together, they catch what I miss. 🟠</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Back link to Station 6 -->
+    <section class="content-section">
+        <p><a href="/stations/station6/">&larr; Back to Station 6: AI and Your Event-Driven Code</a></p>
+    </section>
+
+</MainLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->

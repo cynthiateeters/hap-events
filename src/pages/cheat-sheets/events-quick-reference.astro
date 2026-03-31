@@ -1,0 +1,333 @@
+---
+/**
+ * Cheat Sheet: Events Quick Reference
+ * Companion reference for Station 5 — complete reference for all four stations
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+// Station 1: addEventListener
+const addEventListenerCode = `// The three-part pattern (Station 1)
+const button = document.querySelector('.my-button');
+
+button.addEventListener('click', handleClick);
+//                       ^^^^^^  ^^^^^^^^^^^
+//                       event   callback — no parentheses!
+//                       type
+
+function handleClick(event) {
+  // event is passed automatically by the browser
+}
+
+// Pass the reference, never call it:
+// ✓  addEventListener('click', handleClick)
+// ✗  addEventListener('click', handleClick())`;
+
+// Station 2: The event object
+const eventObjectCode = `// The event object (Station 2)
+element.addEventListener('click', function(event) {
+  event.target          // element that was clicked
+  event.currentTarget   // element the listener is on
+  event.type            // 'click', 'submit', etc.
+  event.key             // keyboard: 'Enter', 'a', 'Escape'
+  event.preventDefault()  // stop default browser action
+  event.stopPropagation() // stop bubbling
+});
+
+// event.target vs event.currentTarget:
+// target     — where the event originated (may be a child)
+// currentTarget — where the listener is attached (always same)`;
+
+// Station 3: View switching and forms
+const viewSwitchingCode = `// View switching (Station 3)
+const listView = document.querySelector('.list-view');
+const detailView = document.querySelector('.detail-view');
+const showDetailBtn = document.querySelector('.show-detail');
+const backBtn = document.querySelector('.back-button');
+
+showDetailBtn.addEventListener('click', function() {
+  listView.classList.add('hidden');
+  detailView.classList.remove('hidden');
+});
+
+backBtn.addEventListener('click', function() {
+  detailView.classList.add('hidden');
+  listView.classList.remove('hidden');
+});
+
+// CSS: .hidden { display: none; }`;
+
+const preventDefaultCode = `// Form with preventDefault (Station 3)
+const form = document.querySelector('.my-form');
+
+form.addEventListener('submit', function(event) {
+  event.preventDefault(); // stop page reload
+
+  const input = form.querySelector('.my-input');
+  const value = input.value.trim();
+  if (!value) return;
+
+  // Process the input...
+  input.value = ''; // clear after handling
+});
+
+// Listen on the FORM, not the submit button.
+// Catches keyboard Enter submission too.`;
+
+// Station 4: Delegation
+const delegationCode = `// Event delegation (Station 4)
+const container = document.querySelector('.card-container');
+
+container.addEventListener('click', function(event) {
+  // Find the card, wherever the click landed
+  const card = event.target.closest('.robot-card');
+  if (!card) return; // clicked outside any card
+
+  // Work with the identified card
+  const robotId = card.dataset.robotId;
+  console.log('Clicked card:', robotId);
+});
+
+// Dynamic cards added later work automatically —
+// they bubble up to the same container listener.`;
+
+// Station 5: DOMContentLoaded initialization
+const initCode = `// Initialization order (Station 5)
+document.addEventListener('DOMContentLoaded', function() {
+  // All querySelector calls go here — after DOM is ready
+  const container = document.querySelector('.card-container');
+  const backBtn = document.querySelector('.back-button');
+  const notesForm = document.querySelector('.notes-form');
+
+  // Wire listeners here too
+  container.addEventListener('click', handleCardClick);
+  backBtn.addEventListener('click', handleBack);
+  notesForm.addEventListener('submit', handleNoteSubmit);
+});
+
+// ✗ Never querySelector or addEventListener outside
+//   DOMContentLoaded — elements may not exist yet`;
+
+// Common event types
+const eventTypesCode = `// Common event types
+
+// Mouse
+'click'       // single click or tap
+'dblclick'    // double click
+'mouseover'   // pointer enters element
+'mouseout'    // pointer leaves element
+
+// Keyboard
+'keydown'     // key pressed (fires repeatedly when held)
+'keyup'       // key released
+// Check event.key: 'Enter', 'Escape', 'a', 'ArrowUp', etc.
+
+// Form
+'submit'      // form submitted (listen on form, not button)
+'change'      // select, checkbox, radio changed
+'input'       // text typed in input or textarea
+
+// Page
+'DOMContentLoaded'   // HTML parsed, DOM ready
+'load'               // page + all resources fully loaded`;
+---
+
+<MainLayout
+    title="Events Quick Reference | HAP's Learning Lab"
+    description="Complete quick reference for all DOM event patterns from Stations 1–4: addEventListener, event object, view switching, forms, and delegation."
+    headerTitle="Events Quick Reference"
+    headerSubtitle="Quick Reference"
+    avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1759497938/HAP-learner_dvehmt.jpg"
+    avatarAlt="HAP studying and taking notes"
+    introContent="<p>All four event patterns from Stations 1 through 4, on one page. addEventListener, the event object, view switching and forms, bubbling and delegation &mdash; organized for quick lookup when building the assignment. 🟠</p>"
+    showNavigation={false}
+    footerReminder="Four patterns built on one foundation: addEventListener."
+>
+
+    <!-- Back link to Station 5 -->
+    <section class="content-section">
+        <p><a href="/stations/station5/">&larr; Back to Station 5: Putting It Together</a></p>
+    </section>
+
+    <!-- ============================================================
+         All Four Patterns at a Glance
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">All Four Patterns at a Glance</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">1</div>
+                <div>
+                    <h3>addEventListener (Station 1)</h3>
+                    <p><code>target.addEventListener(eventType, callback)</code> &mdash; three parts. Pass the callback by reference (no parentheses). The browser stores it and calls it when the event fires.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">2</div>
+                <div>
+                    <h3>The Event Object (Station 2)</h3>
+                    <p>The browser passes an <code>event</code> object to every callback. Key properties: <code>event.target</code>, <code>event.key</code>, <code>event.type</code>. Key methods: <code>event.preventDefault()</code>, <code>event.stopPropagation()</code>.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">3</div>
+                <div>
+                    <h3>View Switching and Forms (Station 3)</h3>
+                    <p>Toggle <code>classList</code> to swap between two views. Listen on the <code>form</code> element for <code>submit</code> events. Call <code>event.preventDefault()</code> to stop page reload.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">4</div>
+                <div>
+                    <h3>Delegation (Station 4)</h3>
+                    <p>One listener on a parent container catches events from all children &mdash; including dynamically added ones. Use <code>event.target.closest(selector)</code> to identify which child was acted on.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Station 1: addEventListener
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Station 1 — addEventListener</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">The three-part pattern:</div>
+                <CodeBlock code={addEventListenerCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Station 2: The event object
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Station 2 — The Event Object</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Key event object properties and methods:</div>
+                <CodeBlock code={eventObjectCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Station 3: View switching
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Station 3 — View Switching and Forms</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">View switching with classList:</div>
+                <CodeBlock code={viewSwitchingCode} lang="javascript" />
+            </div>
+
+            <div class="prompt-box mt-2">
+                <div class="prompt-label">Form with preventDefault:</div>
+                <CodeBlock code={preventDefaultCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Station 4: Delegation
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Station 4 — Event Delegation</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">One listener on the parent container:</div>
+                <CodeBlock code={delegationCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Station 5: Initialization
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Station 5 — Initialization Order</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Wire everything inside DOMContentLoaded:</div>
+                <CodeBlock code={initCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Common Event Types
+         ============================================================ -->
+    <section class="content-section">
+        <div class="topic-section">
+            <h2>Common Event Types</h2>
+
+            <div class="prompt-box">
+                <div class="prompt-label">Mouse, keyboard, form, and page events:</div>
+                <CodeBlock code={eventTypesCode} lang="javascript" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Quick Checklist
+         ============================================================ -->
+    <section class="content-section">
+        <div class="tips-container">
+            <h2 class="section-heading-centered">Quick Checklist</h2>
+
+            <div class="tip-card">
+                <div class="tip-number">✓</div>
+                <div>
+                    <h3>No Parentheses on Callbacks</h3>
+                    <p><code>addEventListener('click', handleClick)</code> &mdash; not <code>handleClick()</code>. Parentheses call the function immediately and pass its return value instead of the function itself.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">✓</div>
+                <div>
+                    <h3>Listen on the Form, Not the Button</h3>
+                    <p>Form <code>submit</code> events fire on the <code>&lt;form&gt;</code> element. Listening on the submit button misses keyboard submissions and other ways a form can be submitted.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">✓</div>
+                <div>
+                    <h3>Guard After .closest()</h3>
+                    <p><code>const card = event.target.closest('.robot-card'); if (!card) return;</code> &mdash; always check for <code>null</code> before using the result.</p>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-number">✓</div>
+                <div>
+                    <h3>Wrap Setup in DOMContentLoaded</h3>
+                    <p>All <code>querySelector</code> calls and <code>addEventListener</code> calls must run after the DOM is ready. Put them inside a <code>DOMContentLoaded</code> listener.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Back link to Station 5 -->
+    <section class="content-section">
+        <p><a href="/stations/station5/">&larr; Back to Station 5: Putting It Together</a></p>
+    </section>
+
+</MainLayout>
+<!--
+HAP Educational Content © 2026 Cynthia Teeters. All rights reserved.
+HyBit A. ProtoBot (HAP) character and the apprentice learning methodology are proprietary educational innovations.
+-->
