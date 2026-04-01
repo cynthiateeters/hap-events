@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run:*)",
+      "Bash(bun install:*)",
+      "Bash(git stash:*)",
+      "Bash(node:*)",
+      "mcp__plugin_telegram_telegram__reply",
+      "Bash(cat:*)"
+    ]
+  }
+}
