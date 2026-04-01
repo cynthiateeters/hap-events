@@ -363,7 +363,7 @@ const eslintConfigCode = `// ESLint plugins for event-driven code safety
 
             <div class="prompt-box mt-2">
                 <div class="prompt-label">AGENTS.md additions for event-driven code:</div>
-                <CodeBlock code={agentsMdCode} lang="javascript" />
+                <CodeBlock code={agentsMdCode} lang="markdown" />
                 <p class="code-comment mt-1">I added these exact rules to the Robot ID Card app. You can see them in the <a href="https://github.com/cynthiateeters/hap-7000-events/blob/main/AGENTS.md" target="_blank" rel="noopener noreferrer">source code on GitHub</a>. The app uses addEventListener everywhere, createElement instead of innerHTML, and classList instead of inline styles. That is the prevention layer in action.</p>
             </div>
 
@@ -452,6 +452,43 @@ const eslintConfigCode = `// ESLint plugins for event-driven code safety
                     <h3>Copilot Code Review &mdash; AI Reviewer</h3>
                     <p><code>gh pr edit --add-reviewer @copilot</code>. Reviews the full repo context on every PR. A second pair of eyes that never has to recharge.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 12: Learning Objectives Checklist
+         ============================================================ -->
+    <section class="content-section">
+        <h2>Learning Objectives Checklist</h2>
+        <p class="mt-1"><strong>Congratulations on completing all six stations of HAP's Learning Lab!</strong> Before you finish, verify you have mastered the core event-handling patterns and the principles of responsible AI use:</p>
+
+        <div class="analysis-grid mt-2">
+            <div class="analysis-point">
+                <h3>Event Fundamentals</h3>
+                <ul class="mt-1">
+                    <li>I can wire up an event listener with addEventListener and explain the three-part pattern</li>
+                    <li>I can read event.target and event.type to make smart decisions inside a callback</li>
+                    <li>I can explain the difference between event.target and event.currentTarget</li>
+                </ul>
+            </div>
+
+            <div class="analysis-point">
+                <h3>Interactive Patterns</h3>
+                <ul class="mt-1">
+                    <li>I can switch views on a single page by toggling a .hidden class</li>
+                    <li>I can handle form submissions with preventDefault and read values with FormData</li>
+                    <li>I can use event delegation with .closest() to handle dynamic content</li>
+                </ul>
+            </div>
+
+            <div class="analysis-point">
+                <h3>AI-Assisted Development</h3>
+                <ul class="mt-1">
+                    <li>I can identify when AI-generated code assumes the wrong architecture</li>
+                    <li>I can spot innerHTML and onclick patterns and replace them with safer alternatives</li>
+                    <li>I can describe the four layers of defense: AGENTS.md, ESLint, Husky, and Copilot review</li>
+                </ul>
             </div>
         </div>
     </section>

@@ -59,14 +59,6 @@ cardContainer.addEventListener('click', function(event) {
 // event.target        → <span>the span you clicked</span>
 // event.currentTarget → <div class="card-container">...</div>`;
 
-const preventDefaultCode = `// event.preventDefault() — stop the browser's default behavior
-const link = document.querySelector('a.internal-nav');
-
-link.addEventListener('click', function(event) {
-  event.preventDefault(); // Don't follow the href
-  console.log('Link clicked, but page did not navigate');
-  // Now handle navigation yourself
-});`;
 ---
 
 <StationLayout

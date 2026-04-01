@@ -104,7 +104,7 @@ notesForm.addEventListener('submit', function(event) {
     stationNumber={3}
     title="Swapping Views"
     subtitle="View switching, forms, and preventDefault"
-    description="HAP builds a single-page detail view by toggling a .hidden class, then tames form reloads with preventDefault. One page, many views."
+    description="HAP builds a single-page detail view by toggling a .hidden class, then tames form reloads with preventDefault. One page, many views, no navigation."
     avatarImage="https://res.cloudinary.com/cynthia-teeters/image/upload/f_auto,q_auto,w_200,c_limit/v1763230755/hap-page-swirl_jad9ji.jpg"
     avatarAlt="HAP surrounded by swirling page panels, learning to swap views"
     introContent={introContent}
@@ -193,7 +193,7 @@ notesForm.addEventListener('submit', function(event) {
 
             <div class="prompt-box mt-2">
                 <div class="prompt-label">The .hidden CSS rule (add to your stylesheet):</div>
-                <CodeBlock code={hiddenClassCssNote} lang="javascript" />
+                <CodeBlock code={hiddenClassCssNote} lang="css" />
                 <p class="code-comment mt-1">One rule in the stylesheet does all the work. Toggling a class is cleaner than setting inline styles because it separates concerns: JavaScript manages state, CSS manages appearance.</p>
             </div>
 
