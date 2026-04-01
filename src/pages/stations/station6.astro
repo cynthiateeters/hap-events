@@ -364,6 +364,7 @@ const eslintConfigCode = `// ESLint plugins for event-driven code safety
             <div class="prompt-box mt-2">
                 <div class="prompt-label">AGENTS.md additions for event-driven code:</div>
                 <CodeBlock code={agentsMdCode} lang="javascript" />
+                <p class="code-comment mt-1">I added these exact rules to the Robot ID Card app. You can see them in the <a href="https://github.com/cynthiateeters/hap-7000-events/blob/main/AGENTS.md" target="_blank" rel="noopener noreferrer">source code on GitHub</a>. The app uses addEventListener everywhere, createElement instead of innerHTML, and classList instead of inline styles. That is the prevention layer in action.</p>
             </div>
 
             <div class="prompt-box mt-2">
